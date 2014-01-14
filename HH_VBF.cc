@@ -42,7 +42,10 @@ int main() {
         int pID;
         unsigned nparticles;
         vector<PseudoJet> vbfjets;
-        vector<PseudoJet> bjets;          
+        vector<PseudoJet> bjets; 
+        vector<PseudoJet> neutrinos;          
+        vector<PseudoJet> leptons;
+        vector<PseudoJet> photons;                    
         int nb = 0;
         int nvbf = 0;
         in1>>nparticles;  

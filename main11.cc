@@ -87,7 +87,7 @@ pythia.readString("SLHA:allowUserOverride = off ");
 pythia.readString("PartonLevel:MI = off"); // Off multiple interactions
 pythia.readString("PartonLevel:ISR = off"); // Shower on
 pythia.readString("PartonLevel:FSR = off"); // Shower on
-//pythia.readString("PartonLevel:FSRinResonances  = off"); // Off multiple interactions
+pythia.readString("PartonLevel:FSRinResonances  = off"); // Off multiple interactions
 pythia.readString("HadronLevel:all = off"); // Of hadronization
 ///////////////////////////////////////////////////////////////////
   // Create an LHAup object that can access relevant information in pythia.

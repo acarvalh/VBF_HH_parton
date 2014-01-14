@@ -62,7 +62,7 @@ int fill_hist(
 /////////////////////////////////////////////////////////////////////////
 // save the histos
 int save_hist(int nmass){
-const char* Mass = Form("Control_shower_%d.root",nmass);
+const char* Mass = Form("histos/Control_shower_%d.root",nmass);
 TFile f1(Mass, "recreate");
 //cout<<basic.size()<<endl;
 f1.cd();

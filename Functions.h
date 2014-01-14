@@ -6,3 +6,9 @@
 
 // Test function
 void hello();
+///////////////////////////////////////////////////////////
+int decla(int);
+int fill_hist(const vector<fastjet::PseudoJet> ,const vector<fastjet::PseudoJet> ,
+		const fastjet::PseudoJet ,const fastjet::PseudoJet);
+int save_hist(int);
+//////////////////////////////////////////////////////////

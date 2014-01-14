@@ -9,7 +9,7 @@ uses the output of the main11.cc commited here
 
 mkdir histos
 
-make HH_VBF (fix your root and fastjet paths)
+make HH_VBF (fix your root and fastjet paths on the Makefile)
 
 ./HH_VBF
 

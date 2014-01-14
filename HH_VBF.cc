@@ -18,7 +18,7 @@ int main() {
   // input
   vector<string> filename;
   string file, path,data;
-  path="/home/xanda/Documents/ggAnalysis/Parton/VBF_HH_parton/bulk_graviton/RSG_WBF_hh-Mhh";
+  path="bulk_graviton/RSG_WBF_hh-Mhh";
   data = ".lhe.decayed";
   for(unsigned i=0;i<masses;i++){
     ostringstream o;

@@ -19,62 +19,223 @@
 #include <TObject.h>
 #include <TMath.h>
 #include "root_plot.h" //declare the histos
+#include "cuts.h" // basic cuts 
 using namespace fastjet;
 using namespace std;
 
-void hello(){
-  cout<<"\n\n\n HELLO!!!! \n\n"<<endl;
-}
+void hello(){cout<<"\n\n\n HELLO!!!! \n\n"<<endl;}
 /////////////////////////////////////////////////////////////////
-int fill_hist(
-        // vector that keep the higgses constituents
-        vector<PseudoJet> H1,
-        vector<PseudoJet> H2,
-        // bvf jets
-        PseudoJet j1, PseudoJet j2
-        ){
-        PseudoJet Higgs_1 = H1.at(0)+H1.at(1);
-        PseudoJet Higgs_2 = H2.at(0)+H2.at(1);
-        PseudoJet Xres= Higgs_1 + Higgs_2;
-        //
-        double DRhh = Higgs_1.delta_R(Higgs_2); // in between Higgs
-        //double DRjj=-10, deltarap=-10;
-        //if(!fattag) {DRjj= j1.delta_R(j2); deltarap= abs(higgs_b.eta()-Higgs_ph.eta());}// in between the jets
-        //
-        const int numvar=25;
-        double monovar[numvar] = {
-          Higgs_1.m(), Higgs_1.e(), Higgs_1.pt(), Higgs_1.eta(), Higgs_1.phi(), //5
-//	  0,0,0,0,0, //5
-	  0, //1
-	  Higgs_2.m(),Higgs_2.e(),Higgs_2.pt(),Higgs_2.eta(),Higgs_2.phi(), // 5
-	  Xres.m(),Xres.e(),Xres.pt(),Xres.eta(),Xres.phi(), // 5
-//	  0,0,0,0,0, //5
-//	  0,0,0,0,0, //5
-	  0,  //DPhiphph, // 2
-	  DRhh, //DPhihh, // 2
-//	  0,
-	  0,// DPhijj, // 2
-	  0,0,0,0,0
-    }; //25
-  for (int j=0; j<numvar; j++) basic[j]->Fill(monovar[j],1);
-  return 1;
-}
+bool analyse_4b(
+	vector<PseudoJet> jets, vector<int> fattag, vector<int> btag, vector<int> bmistag,vector<int> vbftag){
+  // pair the jets that was not VBF tagged
+  bool found = false;
+  // now we separate analysis
+  // number of fattags
+  int nfat=0, nbtag=0, nmistag=0;
+  for(int i=0;i<jets.size();i++) 
+	{nfat = nfat + fattag[i]; nbtag = nbtag + btag[i]; nmistag = nmistag + bmistag[i];}
+  PseudoJet H1,H2;
+  float Hmin = higgs_mass*(1-tolerance);
+  float Hmax = higgs_mass*(1+tolerance);
+  if(jets.size() > 3 && nfat >1) { // close if 1 tag
+    std::cout<<"2 tag! "<<std::endl;
+    //if(nfat ==2){
+      H1=jets.at(fattag[0]);
+      H2=jets.at(fattag[2]);
+    //} //else found= false; // if more than 2 thinhk 
+    // quality requirements   
+    double massDiff = abs(2*(H1.m() - H2.m())/(H1.m() + H2.m()));
+    double rapDiff = abs(H1.eta() - H2.eta());
+    if( 
+       massDiff < tolerance && //rapDiff < deltaEtaHH &&
+       (H1.m() > Hmin && H1.m() < Hmax) &&
+       (H2.m() > Hmin && H2.m() < Hmax)
+      ){ std::cout<<"getting there"<<std::endl; found=true;}   
+  } // close 1 tag
+   else if(jets.size() > 4 && nfat ==1 && found==false) { 
+   std::cout<<"1 tag! "<<std::endl;
+   H1=jets.at(fattag[0]);
+   // pair H2 the jets by the minimum invariant mass difference with H1
+   std::vector<double> a1; 
+   std::vector< int > jetn1, jetn2; // to keep the pairs
+   double invmassB =  H1.m();
+   for(int nj1=0; nj1< jets.size(); nj1++)  if(nj1 != vbftag[0] && nj1 != vbftag[1]) 
+     for(int nj2=nj1+1; nj2< jets.size(); nj2++) if(nj2 != vbftag[0] && nj2 != vbftag[1]) { 
+	   //std::cout<<nj1<<nj2<<" "<<nj3<<nj4<<std::endl;
+	   double invmassA =  (jets.at(nj1)+jets.at(nj2)).m();
+	   a1.push_back((invmassA-invmassB)*(invmassA-invmassB)); 
+	   jetn1.push_back(nj1);jetn2.push_back(nj2); // we also what to keep the nj...           
+    } // loop on jets
+    int minM;
+    //Find the minumum value of the vector (iterator version)
+    minM = TMath::LocMin(a1.size(), &a1[0]);
+    std::cout<<"hi, the jets pairs are !!!! "<<jetn1[minM]<<jetn2[minM]<<" "
+	<<fattag[0]<<std::endl;
+    H2=jets.at(jetn1[minM])+jets.at(jetn2[minM]);
+    // quality requirements   
+    double massDiff = abs(2*(H1.m() - H2.m())/(H1.m() + H2.m()));
+    double rapDiff = abs(H1.eta() - H2.eta());
+    if( 
+       massDiff < tolerance && //rapDiff < deltaEtaHH &&
+       (H1.m() > Hmin && H1.m() < Hmax) &&
+       (H2.m() > Hmin && H2.m() < Hmax)
+      ){ std::cout<<"getting there"<<std::endl; found=true;}   
+  } // close if 1 tag
+  else if(jets.size() > 5 && nfat ==0 && found==false) { // resolved
+   // pair the jets by the minimum invariant mass difference
+   std::vector<double> a1; 
+   std::cout<<"resolved! "<<std::endl;
+   std::vector< int > jetn1, jetn2,jetn3, jetn4; // to keep the pairs
+   for(int nj1=0; nj1< jets.size(); nj1++)  if(nj1 != vbftag[0] && nj1 != vbftag[1]) 
+     for(int nj2=nj1+1; nj2< jets.size(); nj2++) if(nj2 != vbftag[0] && nj2 != vbftag[1]) 
+       for(int nj3=nj2+1; nj3< jets.size(); nj3++)  if(nj3 != vbftag[0] && nj3 != vbftag[1])   
+	 for(int nj4=nj3+1; nj4< jets.size(); nj4++)  if(nj4 != vbftag[0] && nj4 != vbftag[1]) { 
+	   //std::cout<<nj1<<nj2<<" "<<nj3<<nj4<<std::endl;
+	   double invmassA =  (jets.at(nj1)+jets.at(nj2)).m();
+	   double invmassB =  (jets.at(nj3)+jets.at(nj4)).m();
+	   a1.push_back((invmassA-invmassB)*(invmassA-invmassB)); 
+	   jetn1.push_back(nj1);jetn2.push_back(nj2); // we also what to keep the nj...
+	   jetn3.push_back(nj3);jetn4.push_back(nj4);
+    } // loop on jets
+    int minM;
+    //Find the minumum value of the vector (iterator version)
+    minM = TMath::LocMin(a1.size(), &a1[0]);
+    std::cout<<"hi, the jets pairs are !!!! "<<jetn1[minM]<<jetn2[minM]<<" "
+	<<jetn3[minM]<<jetn4[minM]<<std::endl;
+    H1=jets.at(jetn1[minM])+jets.at(jetn2[minM]);
+    H2=jets.at(jetn3[minM])+jets.at(jetn4[minM]);  
+    // quality requirements   
+    double massDiff = abs(2*(H1.m() - H2.m())/(H1.m() + H2.m()));
+    double rapDiff = abs(H1.eta() - H2.eta());
+    if( 
+       massDiff < tolerance && //rapDiff < deltaEtaHH &&
+       (H1.m() > Hmin && H1.m() < Hmax) &&
+       (H2.m() > Hmin && H2.m() < Hmax)
+      ){ std::cout<<"getting there"<<std::endl; found=true;} 
+  } // close if resolved
+  //////////////////////////////////////
+  if(found){
+       ///////////////////////////
+       // fill the histos
+       ///////////////////////////
+       //cout<<"fat tag = " <<nfat <<" number of plots "<<basicHiggses.size()<<endl;
+       const int numvar=15;
+       PseudoJet Xres = H1 +H2; 
+       double monovar[numvar] = {
+        H1.m(),H1.pt(),H1.eta(),H1.phi(), //4
+        H2.m(),H2.pt(),H2.eta(),H2.phi(), // 4
+        Xres.m(),Xres.pt(),Xres.eta(),Xres.phi(), // 4
+	nfat,nbtag,nmistag
+       }; //25
+       for (int j=0; j<basicHiggses.size(); j++) basicHiggses[j]->Fill(monovar[j],1); // weight
+  } // close if fill 
+return found; // close if 2 tags
+} // close 4b analysis
+/////////////////////////////////////////////////////////////////
+bool findVBF(vector<PseudoJet> jets, vector<int> fattag, vector<int> btag, vector<int> bmistag, vector<int> & vbftag){
+  // highest invariant mass among the non-tagged
+  vector<int> listNonTag; // list the non tagged
+  for(int nj1=0; nj1< jets.size(); nj1++) { 
+	if(fattag[nj1]==0 
+		//&& btag[nj1] ==0 && bmistag[nj1]==0
+          ) listNonTag.push_back(nj1);
+  }
+  if(listNonTag.size()>1){   // find the hightest inv mass pair 
+    int nfat=0, nbtag=0, nmistag=0;
+    for(int i=0;i<listNonTag.size();i++) 
+	{nfat = nfat + fattag[listNonTag[i]]; nbtag = nbtag + btag[listNonTag[i]]; nmistag = nmistag + bmistag[listNonTag[i]];}
+    std::vector<double> a1; 
+    std::vector< int > jetn1, jetn2; // to keep the pairs
+    for(int nj1=0; nj1< listNonTag.size(); nj1++) 
+	for(int nj2=nj1+1; nj2< listNonTag.size(); nj2++) { // we also what to keep the nj...
+	  double invmass =  (jets.at(listNonTag[nj1])+jets.at(listNonTag[nj2])).m();
+	  a1.push_back(invmass); jetn1.push_back(listNonTag[nj1]);jetn2.push_back(listNonTag[nj2]);
+    } // loop on jets  
+    //
+    int i1; i1 = TMath::LocMax(a1.size(), &a1[0]); // max inv mass
+    vbftag.push_back(jetn1[i1]); vbftag.push_back(jetn2[i1]); // save the pair number
+    double etaVBF = abs(jets.at(vbftag[0]).eta()-jets.at(vbftag[1]).eta());
+    if( 1>0 && a1[i1] > HTVBF && etaVBF > DeltayVBF){ // apply the VBF cuts
+       std::cout<<"hi VBF jets really are !!!! "<<vbftag[0]<<" "<<vbftag[1]<<std::endl;
+       ///////////////////////////
+       // fill the histos
+       ///////////////////////////
+       const int numvar=9;
+       PseudoJet vbfmass = jets.at(vbftag[0]) +jets.at(vbftag[1]); 
+       double Deta = abs(jets.at(vbftag[0]).eta() -jets.at(vbftag[1]).eta());
+       //cout<<"plots vbf "<<basicvbf.size()<<endl;
+       double monovarvbf[numvar] = {
+        jets.at(vbftag[0]).pt(),jets.at(vbftag[0]).eta(), //2
+        jets.at(vbftag[1]).pt(),jets.at(vbftag[1]).eta(), //2
+        vbfmass.m(),Deta, // 2
+	nfat,nbtag,nmistag
+       }; //25
+       for (int j=0; j<basicvbf.size(); j++) basicvbf[j]->Fill(monovarvbf[j],1); // weight
+    return true;
+  } else return false; // close VBF cuts
+ } else{ cout<<"not enought vbf ! "<<listNonTag.size()<<endl; return false;}// close if listnontag>1 
+} // close VBF selection
+/////////////////////////////////////////////////////////////////
+void isbtagged(vector<PseudoJet> jets, vector<int> & btag, vector<int> & bmistag);
+int recojets(vector<PseudoJet> particles,vector<PseudoJet> & jets_akt, vector<int> & btag, vector<int> & bmistag){
+  JetDefinition akt(antikt_algorithm, 0.5);
+  ClusterSequence cs_akt(particles, akt);
+  //vector<PseudoJet> jets_akt;
+  Selector jet_selector = SelectorPtMin(jet_ptmin) && SelectorAbsRapMax(rapmax);
+  if(shower){
+    // first we do akt jets from particles
+    jets_akt = sorted_by_pt(jet_selector(cs_akt.inclusive_jets()));
+  }
+  else{
+    double const ptmin=1e-2;
+    Selector jet_selector_parton = SelectorPtMin(ptmin);
+    jets_akt = sorted_by_pt(jet_selector_parton(cs_akt.inclusive_jets()));
+  }
+  int njets = jets_akt.size();
+  Njets_passing_kLooseID->Fill(njets,1);
+  isbtagged(jets_akt, btag, bmistag); // check wheather the b(c)jet is b--(mis)tagable
+  //jets = jets_akt;
+  return njets;
+} // close cluster jets
+void isbtagged(vector<PseudoJet> jets, vector<int> & btag, vector<int> & bmistag){ 
+  int see=0,see2=0;
+  for (int i=0; i<jets.size(); i++) { // check wheter jet have inside a b's are taggable 
+     vector<PseudoJet> constituents=jets.at(i).constituents();
+     for (int j=0; j<constituents.size(); j++) {
+       if( (constituents.at(j).user_index() == 5 || constituents.at(j).user_index() == -5 )
+	    && constituents.at(j).pt() > 10
+          ) {see++;} 
+       if( constituents.at(j).pt() > 10 && abs(constituents.at(j).user_index()) == 4) see2++; 
+     } // close constituents
+     if(see>0) btag.push_back(1); else btag.push_back(0); // count only one tag/jet
+     if(see2>0) bmistag.push_back(1); else bmistag.push_back(0); // count only one tag/jet
+     //bmistag.push_back(see2);
+     //cout<<"b-quarks mistagged = " <<bmistag[i] <<" b-quark = " <<btag[i] <<endl;
+  } // close for each jet
+} // close isbtagged
+//////////////////////////////////////////////////////////////////////////////////////////////
+void istagged(vector<PseudoJet> jets, vector<int> & fattag){
+  for (int i=0; i<jets.size(); i++) { // check wheter b's are taggable 
+     int see=0;
+     if( jets.at(i).m() > 100) see = 1; else see = 0; 
+     fattag.push_back(see);
+  } // close for each jets
+} // close istagged
 /////////////////////////////////////////////////////////////////////////
 // save the histos
 int save_hist(int nmass){
-const char* Mass = Form("histos/Control_shower_%d.root",nmass);
-TFile f1(Mass, "recreate");
-//cout<<basic.size()<<endl;
-f1.cd();
-//cout<<nmass<<endl;
-Njets_passing_kLooseID->Write();
-//Sel->Write();
-//cout<<nmass<<endl;
-for (int i=0; i<basic.size(); i++) {basic[i]->Write(); }
-f1.Close();
-for (int i=0; i<24; i++) basic[i]->Reset();
-
-return 1;
+  const char* Mass = Form("histos/Control_shower_%d.root",nmass);
+  TFile f1(Mass, "recreate");
+  f1.cd();
+  Njets_passing_kLooseID->Write();
+  for (int j=0; j<basicHiggses.size(); j++){basicHiggses[j]->Write();}
+  for (int i=0; i<basicvbf.size(); i++) {basicvbf[i]->Write();}
+  f1.Close();
+  //
+  Njets_passing_kLooseID->Reset();
+  for (int i=0; i<basicHiggses.size(); i++) basicHiggses[i]->Reset();
+  for (int i=0; i<basicvbf.size(); i++) basicvbf[i]->Reset();
+  return 1;
 }
 ///////////////////////////////////////////////////////////////////////////
 // declare the histos
@@ -87,185 +248,186 @@ int decla(int mass){
 	Njets_passing_kLooseID->GetYaxis()->SetTitle("");
 	Njets_passing_kLooseID->GetXaxis()->SetTitle("Njets after showering");
 
-	TH1F *PPhotonsMass = new TH1F("PhotonsMass_ct4",  
+	TH1F *H1hist = new TH1F("H1hist",  
+		label, 
+		30, 95, 185);
+	H1hist->GetYaxis()->SetTitle("Events/ 2 GeV");
+	H1hist->GetXaxis()->SetTitle("M_{H1} (GeV)");
+	basicHiggses.push_back (H1hist); 
+
+	TH1F *H1histpt = new TH1F("H1histpt",  
+		label, 
+		30, 95, 185);
+	H1histpt->GetYaxis()->SetTitle("Events/ 2 GeV");
+	H1histpt->GetXaxis()->SetTitle("H1 P_T (GeV)");
+	basicHiggses.push_back (H1histpt); 
+
+	TH1F *H1histeta = new TH1F("H1histeta",  
+		label, 
+		30, -6, 6);
+	H1histeta->GetYaxis()->SetTitle("Events/ 2 GeV");
+	H1histeta->GetXaxis()->SetTitle("#eta_{H1} (GeV)");
+	basicHiggses.push_back (H1histeta); 
+
+	TH1F *H1histphi = new TH1F("H1histphi",  
+		label, 
+		30, -4, 4);
+	H1histphi->GetYaxis()->SetTitle("Events/ 2 GeV");
+	H1histphi->GetXaxis()->SetTitle("#phi_{H1} (GeV)");
+	basicHiggses.push_back (H1histphi); 
+
+	//
+
+	TH1F *H2hist = new TH1F("H2hist",  
+		label, 
+		30, 95, 185);
+	H2hist->GetYaxis()->SetTitle("Events/ 2 GeV");
+	H2hist->GetXaxis()->SetTitle("M_{H2} (GeV)");
+	basicHiggses.push_back (H2hist); 
+
+	TH1F *H2histpt = new TH1F("H2histpt",  
 		label, 
 		1000, 95, 185);
-	PPhotonsMass->GetYaxis()->SetTitle("Events/ 2 GeV");
-	PPhotonsMass->GetXaxis()->SetTitle("M_{#gamma #gamma} (GeV)");
-	basic.push_back (PPhotonsMass); //69
-	//
-	TH1F *Dipho_E = new TH1F("dipho_E_ct4",  
+	H2histpt->GetYaxis()->SetTitle("Events/ 2 GeV");
+	H2histpt->GetXaxis()->SetTitle("H2 P_T (GeV)");
+	basicHiggses.push_back (H2histpt); 
+
+	TH1F *H2histeta = new TH1F("H2histeta",  
 		label, 
-		40, 90, 800);
-	Dipho_E->GetYaxis()->SetTitle("Events");
-	Dipho_E->GetXaxis()->SetTitle("E_{#gamma #gamma} (GeV)");
-	basic.push_back (Dipho_E); //70
-	//
-	TH1F *Dipho_pt = new TH1F("dipho_pt_ct4",  
+		30, -6, 6);
+	H2histeta->GetYaxis()->SetTitle("Events/ 2 GeV");
+	H2histeta->GetXaxis()->SetTitle("#eta_{H2} (GeV)");
+	basicHiggses.push_back (H2histeta); 
+
+	TH1F *H2histphi = new TH1F("H2histphi",  
 		label, 
-		25, -1, 510);
-	Dipho_pt->GetYaxis()->SetTitle("Events/ 2 GeV");
-	Dipho_pt->GetXaxis()->SetTitle("Pt_{#gamma #gamma} (GeV)");
-	basic.push_back (Dipho_pt); //71
+		30, -4, 4);
+	H2histphi->GetYaxis()->SetTitle("Events/ 2 GeV");
+	H2histphi->GetXaxis()->SetTitle("#phi_{H2} (GeV)");
+	basicHiggses.push_back (H2histphi); 
+
 	//
-	TH1F *Dipho_eta = new TH1F("dipho_eta_ct4",  
-		label, 
-		35, -9, 9);
-	Dipho_eta->GetYaxis()->SetTitle("Events/ 2 GeV");
-	Dipho_eta->GetXaxis()->SetTitle("#eta_{#gamma #gamma}");
-	basic.push_back (Dipho_eta); //72
-	//
-	TH1F *Dipho_phi = new TH1F("dipho_phi_ct4",  
-		label, 
-		25, -4.14, 7.14);
-	Dipho_phi->GetYaxis()->SetTitle("Events/ 2 GeV");
-	Dipho_phi->GetXaxis()->SetTitle("#phi_{#gamma #gamma}");
-	basic.push_back (Dipho_phi); //73
-	//
-	// dijet variables
-	//
-	// "JetsMass","dijet_E","dijet_Pt","dijet_Eta","dijet_Phi",
-	TH1F *Njets_passing_kLooseID2 = new TH1F("njets_passing_kLooseID_ct42",  
-		label, 
-		11, -1.5, 9.5);
-	Njets_passing_kLooseID2->GetYaxis()->SetTitle("");
-	Njets_passing_kLooseID2->GetXaxis()->SetTitle("Njets after reconstruction");
-	basic.push_back (Njets_passing_kLooseID2);
-	//
-	TH1F *JJetsMass = new TH1F("JetsMass_ct4",  
-		label, 
-		50, 0, 400);
-	JJetsMass->GetXaxis()->SetTitle("M_{jj} (GeV)");
-	basic.push_back (JJetsMass);
-	//
-	TH1F *Dijet_E = new TH1F("dijet_E_ct4",  
-		label, 
-		40, 0, 600);
-	Dijet_E->GetYaxis()->SetTitle("Events/ 2 GeV");
-	Dijet_E->GetXaxis()->SetTitle("E_{jj} (GeV)");
-	basic.push_back (Dijet_E);
-	//
-	TH1F *Dijet_pt = new TH1F("dijet_pt_ct4",  
-		label, 
-		60, 0, 700);
-	Dijet_pt->GetXaxis()->SetTitle("Pt_{jj} (GeV)");
-	basic.push_back (Dijet_pt);
-	//
-	TH1F *Dijet_eta = new TH1F("dijet_eta_ct4",  
-		label, 
-		35, -9, 9);
-	Dijet_eta->GetYaxis()->SetTitle("Events/ 2 GeV");
-	Dijet_eta->GetXaxis()->SetTitle("#eta_{jj}");
-	basic.push_back (Dijet_eta);
-	//
-	TH1F *Dijet_phi = new TH1F("dijet_phi_ct4",  
-		label, 
-		25, -4.14, 7.14);
-	Dijet_phi->GetYaxis()->SetTitle("");
-	Dijet_phi->GetXaxis()->SetTitle("#phi_{jj}");
-	basic.push_back (Dijet_phi);
-	//
-	// radion variables
-	//
-	//  "RadMass", "radion_E", "radion_Pt", "radion_Eta","radion_Phi",
+
 	TH1F *RRadMass = new TH1F("RadMass_ct4",  
 		label, 
-		50, 50, 2500);
-	RRadMass->GetXaxis()->SetTitle("M_{#gamma #gamma j j } (GeV)");
-	basic.push_back (RRadMass);
-	//
-	TH1F *Radion_E = new TH1F("radion_E_ct4",  
-		label, 
-		40, 150, 2000);
-	Radion_E->GetXaxis()->SetTitle("E_{##gamma #gamma j j } (GeV)");
-	basic.push_back (Radion_E);
-	//
+		90, 50, 5500);
+	RRadMass->GetXaxis()->SetTitle("M_{ HH } (GeV)");
+	basicHiggses.push_back (RRadMass);
+	
 	TH1F *Radion_pt = new TH1F("radion_pt_ct4",  
 		label, 
 		40, 0, 700);
 	Radion_pt->GetYaxis()->SetTitle("");
 	Radion_pt->GetXaxis()->SetTitle("Pt_{#gamma #gamma j j } (GeV)");
-	basic.push_back (Radion_pt);
-	//
+	basicHiggses.push_back (Radion_pt);
+	
 	TH1F *Radion_eta = new TH1F("radion_eta_ct4",  
 		label, 
 		35, -9 , 9);
 	Radion_eta->GetYaxis()->SetTitle("");
 	Radion_eta->GetXaxis()->SetTitle("#eta_{#gamma #gamma j j }");
-	basic.push_back (Radion_eta);
+	basicHiggses.push_back (Radion_eta);
 	//
 	TH1F *Radion_phi = new TH1F("radion_phi_ct4",  
 		label, 
-		25, -4.14, 7.14);
+		25, 0, 7.14);
 	Radion_phi->GetYaxis()->SetTitle("");
 	Radion_phi->GetXaxis()->SetTitle("#phi_{#gamma #gamma j j }");
-	basic.push_back (Radion_phi);
+	basicHiggses.push_back (Radion_phi);
+
 	//
-	// distances no var on tree
-	//
-	TH1F *DRphph = new TH1F("DRphph_ct4",  
+
+	TH1F *Nfattag = new TH1F("fattag_ct4",  
 		label, 
-		30, -2, 9);
-	DRphph->GetYaxis()->SetTitle("");
-	DRphph->GetXaxis()->SetTitle("#Delta R( #gamma #gamma )");
-	basic.push_back (DRphph);
-	//
-	TH1F *DRhh = new TH1F("DRhh_ct4",  
+		6, -1.5, 4.5);
+	Nfattag->GetYaxis()->SetTitle("");
+	Nfattag->GetXaxis()->SetTitle("Number of fat tags");
+	basicHiggses.push_back (Nfattag);
+
+	TH1F *Nbtag = new TH1F("btag_ct4",  
 		label, 
-		50, -2, 9);
-	DRhh->GetYaxis()->SetTitle("");
-	DRhh->GetXaxis()->SetTitle("#Delta R( H H )");
-	basic.push_back (DRhh);
-	//
-	TH1F *DRjj = new TH1F("DRjj_ct4",  
+		9, -1.5, 7.5);
+	Nbtag->GetYaxis()->SetTitle("");
+	Nbtag->GetXaxis()->SetTitle("Number b-jets");
+	basicHiggses.push_back (Nbtag);
+
+	TH1F *Nbmistag = new TH1F("bmistag_ct4",  
 		label, 
-		50, -2, 9);
-	DRjj->GetYaxis()->SetTitle("");
-	DRjj->GetXaxis()->SetTitle("#Delta R( jj )");
-	basic.push_back (DRjj);
-	//
-	TH1F *AAass = new TH1F("aaass_ct4",  
+		7, -1.5, 5.5);
+	Nbmistag->GetYaxis()->SetTitle("");
+	Nbmistag->GetXaxis()->SetTitle("Number mistagged b jets's");
+	basicHiggses.push_back (Nbmistag);
+	/////////////////////////////////////////////////////////////////////
+
+	TH1F *j1histpt = new TH1F("j1histpt",  
 		label, 
-		20, 0, 6);
-	AAass->GetYaxis()->SetTitle("");
-	AAass->GetXaxis()->SetTitle("delta pseudorapidity #gamma");
-	basic.push_back (AAass);
-	//
-	TH1F *JJass = new TH1F("jjass_ct4",  
+		1000, 95, 185);
+	j1histpt->GetYaxis()->SetTitle("Events/ 2 GeV");
+	j1histpt->GetXaxis()->SetTitle("vbf j1 P_T (GeV)");
+	basicvbf.push_back (j1histpt); 
+
+	TH1F *j1histeta = new TH1F("j1histeta",  
 		label, 
-		4, -0.5, 3.5);
-	JJass->GetYaxis()->SetTitle("");
-	JJass->GetXaxis()->SetTitle("generated jets selected");
-	basic.push_back (JJass);
+		1000, -6, 6);
+	j1histeta->GetYaxis()->SetTitle("Events/ 2 GeV");
+	j1histeta->GetXaxis()->SetTitle("vbf #eta_{j1} (GeV)");
+	basicvbf.push_back (j1histeta); 
+
 	//
-	TH1F *leadsel = new TH1F("leadsel_ct4",  
+
+	TH1F *j2histpt = new TH1F("j2histpt",  
 		label, 
-		10, -0.5, 9.5);
-	leadsel->GetYaxis()->SetTitle("");
-	leadsel->GetXaxis()->SetTitle("leading photon selected resolved");
-	basic.push_back (leadsel);
+		1000, 95, 185);
+	j2histpt->GetYaxis()->SetTitle("Events/ 2 GeV");
+	j2histpt->GetXaxis()->SetTitle("vbf j2 P_T (GeV)");
+	basicvbf.push_back (j2histpt); 
+
+	TH1F *j2histeta = new TH1F("j2histeta",  
+		label, 
+		1000, -6, 6);
+	j2histeta->GetYaxis()->SetTitle("Events/ 2 GeV");
+	j2histeta->GetXaxis()->SetTitle("vbf #eta_{j2} (GeV)");
+	basicvbf.push_back (H2histeta); 
+
 	//
-	TH1F *subleadsel = new TH1F("sublead_ct4",  
+
+	TH1F *RRadMassvbf = new TH1F("RadMass_ct4vbf",  
 		label, 
-		10, -0.5, 9.5);
-	subleadsel->GetYaxis()->SetTitle("");
-	subleadsel->GetXaxis()->SetTitle("subleading photon selected resolved");
-	basic.push_back (subleadsel);
+		50, 50, 2500);
+	RRadMassvbf->GetXaxis()->SetTitle("vbf M_{j j} (GeV)");
+	basicvbf.push_back (RRadMassvbf);
+
 	//
-	TH1F *fattagreco = new TH1F("fattagreco_ct4",  
+
+	TH1F *Detavbf = new TH1F("Deta",  
 		label, 
-		5, -0.5, 4.5);
-	fattagreco->GetYaxis()->SetTitle("");
-	fattagreco->GetXaxis()->SetTitle("fat jet selected");
-	basic.push_back (fattagreco);
+		50, 0, 25);
+	Detavbf->GetXaxis()->SetTitle("vbf #Delta #eta");
+	basicvbf.push_back (Detavbf);
+	
 	//
-	TH1F *fattagrecon = new TH1F("fattagrecon_ct4",  
+
+	TH1F *Nfattagvbf = new TH1F("fattag_ct4vbf",  
 		label, 
-		5, -0.5, 4.5);
-	fattagrecon->GetYaxis()->SetTitle("");
-	fattagrecon->GetXaxis()->SetTitle("# of fat jet reconstructed");
-	basic.push_back (fattagrecon);
-        //basic[0][0][0][2].Rebin(200, mass-100, mass+100);
+		6, -1.5, 4.5);
+	Nfattagvbf->GetYaxis()->SetTitle("");
+	Nfattagvbf->GetXaxis()->SetTitle("Number of fat tags vbf");
+	basicvbf.push_back (Nfattagvbf);
+
+	TH1F *Nbtagvbf = new TH1F("btag_ct4vbf",  
+		label, 
+		7, -1.5, 5.5);
+	Nbtagvbf->GetYaxis()->SetTitle("");
+	Nbtagvbf->GetXaxis()->SetTitle("Number b-jets vbf");
+	basicvbf.push_back (Nbtagvbf);
+
+	TH1F *Nbmistagvbf = new TH1F("bmistag_ct4vbf",  
+		label, 
+		7, -1.5, 5.5);
+	Nbmistagvbf->GetYaxis()->SetTitle("");
+	Nbmistagvbf->GetXaxis()->SetTitle("Number mistagged b jets's vbf");
+	basicvbf.push_back (Nbmistagvbf);
+
 return 1;
 }
 

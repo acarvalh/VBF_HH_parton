@@ -36,13 +36,13 @@ int main() {
     decla(mass[i]);
     for(unsigned ievent=0;ievent<nevent;ievent++){ // for each event  // 
 //    for(unsigned ievent=0;ievent<20;ievent++){ // for each event  // 
+        cout<<"----------------------------------------------------"<<endl;
         string c;
         in1>>c;
         double Px, Py , Pz, E;
         int pID;
         unsigned nparticles;
-        vector<PseudoJet> vbfjets;
-        vector<PseudoJet> bjets; 
+        vector<PseudoJet> particles; 
         vector<PseudoJet> neutrinos;          
         vector<PseudoJet> leptons;
         vector<PseudoJet> photons;                    
@@ -51,22 +51,29 @@ int main() {
         in1>>nparticles;  
         for(unsigned ipart=0;ipart<nparticles;ipart++){ // loop on particles
           in1 >> pID >> Px >> Py >> Pz >> E ;//>> idup;
-          //cout<< pID <<endl;
-          // photon counter      
-          // if a b quark
-          if (pID == 5 || pID == -5){bjets.push_back(fastjet::PseudoJet(Px,Py,Pz,E));nb++;} 
-	  else {vbfjets.push_back(fastjet::PseudoJet(Px,Py,Pz,E)); vbfjets.at(nvbf).set_user_index(pID); nvbf++;}           
+          //cout<< pID <<endl;    
+          if (abs(pID) < 6 ){  // if a quark/gluon -- neglect hadrons
+		particles.push_back(fastjet::PseudoJet(Px,Py,Pz,E)); particles.at(nvbf).set_user_index(pID); 
+		if(abs(pID) == 5) nb++; else nvbf++; // count b's and no-b's
+	  }           
         } // finish to read all particles
-        if(nb!=4) cout<<"b-quarks = " <<nb <<" light-quarks = " <<nvbf <<endl;
-        // test analysis
-	vector<PseudoJet> H1;
-	vector<PseudoJet> H2;
-        for(int j=0;j<2;j++) H1.push_back(bjets.at(j));
-        for(int j=2;j<4;j++) H2.push_back(bjets.at(j));
-        // bvf jets
-        PseudoJet j1 = vbfjets.at(0); 
-	PseudoJet j2 = vbfjets.at(1);
-	fill_hist(H1, H2, j1, j2);
+        // construct the jets
+	vector<PseudoJet> jets; 
+        // check tags
+	vector<int> btag; vector<int> bmistag; // number of btags/bmistags of each jet entry 
+	vector<int> fattag;
+        int njets = recojets(particles, jets,btag,bmistag);
+	cout<<njets<<endl; 
+        istagged(jets, fattag); // check wheather the jet is fat -- by now only invariant mass
+	// VBF combinatorics and cuts
+	vector<int> vbftag; // keeps the entries of jets that are the VBF, have two entries
+	bool VBF = findVBF(jets, fattag, btag, bmistag, vbftag);
+	if (VBF){ // pass VBF
+	  //vector<int> H1;
+	  //vector<int> H2;
+	  bool reco=false;
+	  if(fourb) reco = analyse_4b(jets,fattag,btag,bmistag,vbftag);
+        } // close pass VBF
     } // close for event
     save_hist(mass[i]);
   } // close for each mass

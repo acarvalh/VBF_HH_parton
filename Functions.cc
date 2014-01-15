@@ -136,9 +136,9 @@ bool findVBF(vector<PseudoJet> jets, vector<int> fattag, vector<int> btag, vecto
   // highest invariant mass among the non-tagged
   vector<int> listNonTag; // list the non tagged
   for(int nj1=0; nj1< jets.size(); nj1++) { 
-	if(fattag[nj1]==0 
-		//&& btag[nj1] ==0 && bmistag[nj1]==0
-          ) listNonTag.push_back(nj1);
+  //cout<<"fat tagged = " <<fattag[nj1]<<" b-quarks mistagged = " <<bmistag[nj1] <<" b-quark = " <<btag[nj1] <<endl;
+	if(fattag[nj1]==0 && btag[nj1] ==0 && bmistag[nj1]==0
+          ) {listNonTag.push_back(nj1);}
   }
   if(listNonTag.size()>1){   // find the hightest inv mass pair 
     int nfat=0, nbtag=0, nmistag=0;
@@ -177,6 +177,7 @@ bool findVBF(vector<PseudoJet> jets, vector<int> fattag, vector<int> btag, vecto
 } // close VBF selection
 /////////////////////////////////////////////////////////////////
 void isbtagged(vector<PseudoJet> jets, vector<int> & btag, vector<int> & bmistag);
+//
 int recojets(vector<PseudoJet> particles,vector<PseudoJet> & jets_akt, vector<int> & btag, vector<int> & bmistag){
   JetDefinition akt(antikt_algorithm, 0.5);
   ClusterSequence cs_akt(particles, akt);
@@ -190,6 +191,18 @@ int recojets(vector<PseudoJet> particles,vector<PseudoJet> & jets_akt, vector<in
     double const ptmin=1e-2;
     Selector jet_selector_parton = SelectorPtMin(ptmin);
     jets_akt = sorted_by_pt(jet_selector_parton(cs_akt.inclusive_jets()));
+/*
+//////////////////
+for (int i=0; i<jets_akt.size(); i++){
+  vector<PseudoJet> constitu=jets_akt.at(i).constituents();
+  cout<<"constituents size "<<constitu.size()<<endl;
+  for (int j=0; j<constitu.size(); j++) {
+    //int test=constitu.at(j).user_index();
+    cout<<"constituents flavour "<< constitu.at(j).user_index()<<endl;
+  }
+}
+//////////////////
+*/
   }
   int njets = jets_akt.size();
   Njets_passing_kLooseID->Fill(njets,1);
@@ -198,20 +211,26 @@ int recojets(vector<PseudoJet> particles,vector<PseudoJet> & jets_akt, vector<in
   return njets;
 } // close cluster jets
 void isbtagged(vector<PseudoJet> jets, vector<int> & btag, vector<int> & bmistag){ 
-  int see=0,see2=0;
+
   for (int i=0; i<jets.size(); i++) { // check wheter jet have inside a b's are taggable 
-     vector<PseudoJet> constituents=jets.at(i).constituents();
-     for (int j=0; j<constituents.size(); j++) {
-       if( (constituents.at(j).user_index() == 5 || constituents.at(j).user_index() == -5 )
-	    && constituents.at(j).pt() > 10
-          ) {see++;} 
-       if( constituents.at(j).pt() > 10 && abs(constituents.at(j).user_index()) == 4) see2++; 
+  int see=0,see2=0;
+     vector<PseudoJet> constitu=jets.at(i).constituents();
+     for (int j=0; j<constitu.size(); j++) {
+       //cout<<"constituents flavour "<<constitu.at(j).user_index()<<endl;
+       if(  constitu.at(j).pt() > 10
+	    && (constitu.at(j).user_index() == 5 || constitu.at(j).user_index() == -5 ) // work !!
+          ) {see++;}//btag.push_back(1);} else btag.push_back(0); 
+       if( constitu.at(j).pt() > 10 
+	    && abs(constitu.at(j).user_index()) == 4  // work !!
+         ) {see2++;}// bmistag.push_back(1);} bmistag.push_back(0);
      } // close constituents
+     //bmistag.push_back(see2);
      if(see>0) btag.push_back(1); else btag.push_back(0); // count only one tag/jet
      if(see2>0) bmistag.push_back(1); else bmistag.push_back(0); // count only one tag/jet
-     //bmistag.push_back(see2);
      //cout<<"b-quarks mistagged = " <<bmistag[i] <<" b-quark = " <<btag[i] <<endl;
   } // close for each jet
+
+
 } // close isbtagged
 //////////////////////////////////////////////////////////////////////////////////////////////
 void istagged(vector<PseudoJet> jets, vector<int> & fattag){

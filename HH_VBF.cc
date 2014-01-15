@@ -34,8 +34,8 @@ int main() {
     in1.open(filename.at(i).c_str());
     // declare the root plots to be done
     decla(mass[i]);
-    for(unsigned ievent=0;ievent<nevent;ievent++){ // for each event  // 
-//    for(unsigned ievent=0;ievent<20;ievent++){ // for each event  // 
+//    for(unsigned ievent=0;ievent<nevent;ievent++){ // for each event  // 
+    for(unsigned ievent=0;ievent<20;ievent++){ // for each event  // 
         cout<<"----------------------------------------------------"<<endl;
         string c;
         in1>>c;
@@ -58,6 +58,7 @@ int main() {
 	  }           
         } // finish to read all particles
         // construct the jets
+        cout<<"nparticles = "<< nb+nvbf<<endl;
 	vector<PseudoJet> jets; 
         // check tags
 	vector<int> btag; vector<int> bmistag; // number of btags/bmistags of each jet entry 

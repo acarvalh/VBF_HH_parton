@@ -18,7 +18,7 @@ int main() {
   // input
   vector<string> filename;
   string file, path,data;
-  path="bulk_graviton/RSG_WBF_hh-Mhh";
+  path="bulk_graviton/kkgraviton_cg";
   data = ".lhe.decayed";
   for(unsigned i=0;i<masses;i++){
     ostringstream o;

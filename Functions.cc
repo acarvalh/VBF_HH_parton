@@ -263,20 +263,20 @@ int decla(int mass){
 
 	Njets_passing_kLooseID = new TH1F("njets_passing_kLooseID_ct4",  
 		label, 
-		11, -1.5, 9.5);
+		11, -0.5, 10.5);
 	Njets_passing_kLooseID->GetYaxis()->SetTitle("");
 	Njets_passing_kLooseID->GetXaxis()->SetTitle("Njets after showering");
 
 	TH1F *H1hist = new TH1F("H1hist",  
 		label, 
-		30, 95, 185);
+		90, 95, 185);
 	H1hist->GetYaxis()->SetTitle("Events/ 2 GeV");
 	H1hist->GetXaxis()->SetTitle("M_{H1} (GeV)");
 	basicHiggses.push_back (H1hist); 
 
 	TH1F *H1histpt = new TH1F("H1histpt",  
 		label, 
-		30, 95, 185);
+		60, 0, 300);
 	H1histpt->GetYaxis()->SetTitle("Events/ 2 GeV");
 	H1histpt->GetXaxis()->SetTitle("H1 P_T (GeV)");
 	basicHiggses.push_back (H1histpt); 
@@ -290,7 +290,7 @@ int decla(int mass){
 
 	TH1F *H1histphi = new TH1F("H1histphi",  
 		label, 
-		30, -4, 4);
+		30, 0, 5);
 	H1histphi->GetYaxis()->SetTitle("Events/ 2 GeV");
 	H1histphi->GetXaxis()->SetTitle("#phi_{H1} (GeV)");
 	basicHiggses.push_back (H1histphi); 
@@ -299,14 +299,14 @@ int decla(int mass){
 
 	TH1F *H2hist = new TH1F("H2hist",  
 		label, 
-		30, 95, 185);
+		90, 95, 185);
 	H2hist->GetYaxis()->SetTitle("Events/ 2 GeV");
 	H2hist->GetXaxis()->SetTitle("M_{H2} (GeV)");
 	basicHiggses.push_back (H2hist); 
 
 	TH1F *H2histpt = new TH1F("H2histpt",  
 		label, 
-		1000, 95, 185);
+		60, 0, 300);
 	H2histpt->GetYaxis()->SetTitle("Events/ 2 GeV");
 	H2histpt->GetXaxis()->SetTitle("H2 P_T (GeV)");
 	basicHiggses.push_back (H2histpt); 
@@ -320,7 +320,7 @@ int decla(int mass){
 
 	TH1F *H2histphi = new TH1F("H2histphi",  
 		label, 
-		30, -4, 4);
+		30, 0, 5);
 	H2histphi->GetYaxis()->SetTitle("Events/ 2 GeV");
 	H2histphi->GetXaxis()->SetTitle("#phi_{H2} (GeV)");
 	basicHiggses.push_back (H2histphi); 
@@ -335,7 +335,7 @@ int decla(int mass){
 	
 	TH1F *Radion_pt = new TH1F("radion_pt_ct4",  
 		label, 
-		40, 0, 700);
+		1400, 0, 700);
 	Radion_pt->GetYaxis()->SetTitle("");
 	Radion_pt->GetXaxis()->SetTitle("Pt_{#gamma #gamma j j } (GeV)");
 	basicHiggses.push_back (Radion_pt);
@@ -380,14 +380,14 @@ int decla(int mass){
 
 	TH1F *j1histpt = new TH1F("j1histpt",  
 		label, 
-		1000, 95, 185);
+		60, 0, 300);
 	j1histpt->GetYaxis()->SetTitle("Events/ 2 GeV");
 	j1histpt->GetXaxis()->SetTitle("vbf j1 P_T (GeV)");
 	basicvbf.push_back (j1histpt); 
 
 	TH1F *j1histeta = new TH1F("j1histeta",  
 		label, 
-		1000, -6, 6);
+		32, -6, 6);
 	j1histeta->GetYaxis()->SetTitle("Events/ 2 GeV");
 	j1histeta->GetXaxis()->SetTitle("vbf #eta_{j1} (GeV)");
 	basicvbf.push_back (j1histeta); 
@@ -396,14 +396,14 @@ int decla(int mass){
 
 	TH1F *j2histpt = new TH1F("j2histpt",  
 		label, 
-		1000, 95, 185);
+		60, 0, 300);
 	j2histpt->GetYaxis()->SetTitle("Events/ 2 GeV");
 	j2histpt->GetXaxis()->SetTitle("vbf j2 P_T (GeV)");
 	basicvbf.push_back (j2histpt); 
 
 	TH1F *j2histeta = new TH1F("j2histeta",  
 		label, 
-		1000, -6, 6);
+		32, -6, 6);
 	j2histeta->GetYaxis()->SetTitle("Events/ 2 GeV");
 	j2histeta->GetXaxis()->SetTitle("vbf #eta_{j2} (GeV)");
 	basicvbf.push_back (H2histeta); 
@@ -412,7 +412,7 @@ int decla(int mass){
 
 	TH1F *RRadMassvbf = new TH1F("RadMass_ct4vbf",  
 		label, 
-		50, 50, 2500);
+		90, 50, 5000);
 	RRadMassvbf->GetXaxis()->SetTitle("vbf M_{j j} (GeV)");
 	basicvbf.push_back (RRadMassvbf);
 

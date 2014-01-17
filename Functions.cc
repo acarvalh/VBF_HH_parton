@@ -38,7 +38,7 @@ bool analyse_4b(
   float Hmin = higgs_mass*(1-tolerance);
   float Hmax = higgs_mass*(1+tolerance);
   if(jets.size() > 3 && nfat >1) { // close if 1 tag
-    std::cout<<"2 tag! "<<std::endl;
+    //std::cout<<"2 tag! "<<std::endl;
     //if(nfat ==2){
       H1=jets.at(fattag[0]);
       H2=jets.at(fattag[2]);
@@ -50,10 +50,10 @@ bool analyse_4b(
        massDiff < tolerance && //rapDiff < deltaEtaHH &&
        (H1.m() > Hmin && H1.m() < Hmax) &&
        (H2.m() > Hmin && H2.m() < Hmax)
-      ){ std::cout<<"getting there"<<std::endl; found=true;}   
+      ){  found=true;}   
   } // close 1 tag
    else if(jets.size() > 4 && nfat ==1 && found==false) { 
-   std::cout<<"1 tag! "<<std::endl;
+   //std::cout<<"1 tag! "<<std::endl;
    H1=jets.at(fattag[0]);
    // pair H2 the jets by the minimum invariant mass difference with H1
    std::vector<double> a1; 
@@ -69,8 +69,8 @@ bool analyse_4b(
     int minM;
     //Find the minumum value of the vector (iterator version)
     minM = TMath::LocMin(a1.size(), &a1[0]);
-    std::cout<<"hi, the jets pairs are !!!! "<<jetn1[minM]<<jetn2[minM]<<" "
-	<<fattag[0]<<std::endl;
+    //std::cout<<"hi, the jets pairs are !!!! "<<jetn1[minM]<<jetn2[minM]<<" "
+	//<<fattag[0]<<std::endl;
     H2=jets.at(jetn1[minM])+jets.at(jetn2[minM]);
     // quality requirements   
     double massDiff = abs(2*(H1.m() - H2.m())/(H1.m() + H2.m()));
@@ -79,12 +79,12 @@ bool analyse_4b(
        massDiff < tolerance && //rapDiff < deltaEtaHH &&
        (H1.m() > Hmin && H1.m() < Hmax) &&
        (H2.m() > Hmin && H2.m() < Hmax)
-      ){ std::cout<<"getting there"<<std::endl; found=true;}   
+      ){ found=true;}   
   } // close if 1 tag
   else if(jets.size() > 5 && nfat ==0 && found==false) { // resolved
    // pair the jets by the minimum invariant mass difference
    std::vector<double> a1; 
-   std::cout<<"resolved! "<<std::endl;
+   //std::cout<<"resolved! "<<std::endl;
    std::vector< int > jetn1, jetn2,jetn3, jetn4; // to keep the pairs
    for(int nj1=0; nj1< jets.size(); nj1++)  if(nj1 != vbftag[0] && nj1 != vbftag[1]) 
      for(int nj2=nj1+1; nj2< jets.size(); nj2++) if(nj2 != vbftag[0] && nj2 != vbftag[1]) 
@@ -100,8 +100,8 @@ bool analyse_4b(
     int minM;
     //Find the minumum value of the vector (iterator version)
     minM = TMath::LocMin(a1.size(), &a1[0]);
-    std::cout<<"hi, the jets pairs are !!!! "<<jetn1[minM]<<jetn2[minM]<<" "
-	<<jetn3[minM]<<jetn4[minM]<<std::endl;
+    //std::cout<<"hi, the jets pairs are !!!! "<<jetn1[minM]<<jetn2[minM]<<" "
+	//<<jetn3[minM]<<jetn4[minM]<<std::endl;
     H1=jets.at(jetn1[minM])+jets.at(jetn2[minM]);
     H2=jets.at(jetn3[minM])+jets.at(jetn4[minM]);  
     // quality requirements   
@@ -111,7 +111,8 @@ bool analyse_4b(
        massDiff < tolerance && //rapDiff < deltaEtaHH &&
        (H1.m() > Hmin && H1.m() < Hmax) &&
        (H2.m() > Hmin && H2.m() < Hmax)
-      ){ std::cout<<"getting there"<<std::endl; found=true;} 
+      ){ //std::cout<<"getting there"<<std::endl; 
+	found=true;} 
   } // close if resolved
   //////////////////////////////////////
   if(found){
@@ -127,7 +128,7 @@ bool analyse_4b(
         Xres.m(),Xres.pt(),Xres.eta(),Xres.phi(), // 4
 	nfat,nbtag,nmistag
        }; //25
-       for (int j=0; j<basicHiggses.size(); j++) basicHiggses[j]->Fill(monovar[j],1); // weight
+       for (int j=0; j<basicHiggses.size(); j++) basicHiggses[j]->Fill(monovar[j],weight); // weight
   } // close if fill 
 return found; // close if 2 tags
 } // close 4b analysis
@@ -156,7 +157,7 @@ bool findVBF(vector<PseudoJet> jets, vector<int> fattag, vector<int> btag, vecto
     vbftag.push_back(jetn1[i1]); vbftag.push_back(jetn2[i1]); // save the pair number
     double etaVBF = abs(jets.at(vbftag[0]).eta()-jets.at(vbftag[1]).eta());
     if( 1>0 && a1[i1] > HTVBF && etaVBF > DeltayVBF){ // apply the VBF cuts
-       std::cout<<"hi VBF jets really are !!!! "<<vbftag[0]<<" "<<vbftag[1]<<std::endl;
+       //std::cout<<"hi VBF jets really are !!!! "<<vbftag[0]<<" "<<vbftag[1]<<std::endl;
        ///////////////////////////
        // fill the histos
        ///////////////////////////
@@ -170,10 +171,11 @@ bool findVBF(vector<PseudoJet> jets, vector<int> fattag, vector<int> btag, vecto
         vbfmass.m(),Deta, // 2
 	nfat,nbtag,nmistag
        }; //25
-       for (int j=0; j<basicvbf.size(); j++) basicvbf[j]->Fill(monovarvbf[j],1); // weight
+       for (int j=0; j<basicvbf.size(); j++) basicvbf[j]->Fill(monovarvbf[j],weight); // weight
     return true;
   } else return false; // close VBF cuts
- } else{ cout<<"not enought vbf ! "<<listNonTag.size()<<endl; return false;}// close if listnontag>1 
+ } else{ //cout<<"not enought vbf ! "<<listNonTag.size()<<endl; 
+         return false;}// close if listnontag>1 
 } // close VBF selection
 /////////////////////////////////////////////////////////////////
 void isbtagged(vector<PseudoJet> jets, vector<int> & btag, vector<int> & bmistag);
@@ -205,7 +207,7 @@ for (int i=0; i<jets_akt.size(); i++){
 */
   }
   int njets = jets_akt.size();
-  Njets_passing_kLooseID->Fill(njets,1);
+  Njets_passing_kLooseID->Fill(njets,weight);
   isbtagged(jets_akt, btag, bmistag); // check wheather the b(c)jet is b--(mis)tagable
   //jets = jets_akt;
   return njets;
@@ -219,6 +221,7 @@ void isbtagged(vector<PseudoJet> jets, vector<int> & btag, vector<int> & bmistag
        //cout<<"constituents flavour "<<constitu.at(j).user_index()<<endl;
        if(  constitu.at(j).pt() > 10
 	    && (constitu.at(j).user_index() == 5 || constitu.at(j).user_index() == -5 ) // work !!
+	    && constitu.at(j).eta() < etab
           ) {see++;}//btag.push_back(1);} else btag.push_back(0); 
        if( constitu.at(j).pt() > 10 
 	    && abs(constitu.at(j).user_index()) == 4  // work !!
@@ -242,8 +245,10 @@ void istagged(vector<PseudoJet> jets, vector<int> & fattag){
 } // close istagged
 /////////////////////////////////////////////////////////////////////////
 // save the histos
-int save_hist(int nmass){
-  const char* Mass = Form("histos/Control_shower_%d.root",nmass);
+int save_hist(int nmass, bool resonant){
+  const char* Mass;
+  if(resonant) Mass = Form("histos/Control_shower_%d.root",nmass);
+  else Mass = Form("histosnonres/Control_shower_%d.root",nmass);
   TFile f1(Mass, "recreate");
   f1.cd();
   Njets_passing_kLooseID->Write();
@@ -263,7 +268,7 @@ int decla(int mass){
 
 	Njets_passing_kLooseID = new TH1F("njets_passing_kLooseID_ct4",  
 		label, 
-		11, -0.5, 10.5);
+		13, -0.5, 12.5);
 	Njets_passing_kLooseID->GetYaxis()->SetTitle("");
 	Njets_passing_kLooseID->GetXaxis()->SetTitle("Njets after showering");
 
@@ -335,23 +340,23 @@ int decla(int mass){
 	
 	TH1F *Radion_pt = new TH1F("radion_pt_ct4",  
 		label, 
-		1400, 0, 700);
+		50, 0, 700);
 	Radion_pt->GetYaxis()->SetTitle("");
-	Radion_pt->GetXaxis()->SetTitle("Pt_{#gamma #gamma j j } (GeV)");
+	Radion_pt->GetXaxis()->SetTitle("Pt_{HH} (GeV)");
 	basicHiggses.push_back (Radion_pt);
 	
 	TH1F *Radion_eta = new TH1F("radion_eta_ct4",  
 		label, 
 		35, -9 , 9);
 	Radion_eta->GetYaxis()->SetTitle("");
-	Radion_eta->GetXaxis()->SetTitle("#eta_{#gamma #gamma j j }");
+	Radion_eta->GetXaxis()->SetTitle("#eta_{HH }");
 	basicHiggses.push_back (Radion_eta);
 	//
 	TH1F *Radion_phi = new TH1F("radion_phi_ct4",  
 		label, 
 		25, 0, 7.14);
 	Radion_phi->GetYaxis()->SetTitle("");
-	Radion_phi->GetXaxis()->SetTitle("#phi_{#gamma #gamma j j }");
+	Radion_phi->GetXaxis()->SetTitle("#phi_{HH}");
 	basicHiggses.push_back (Radion_phi);
 
 	//

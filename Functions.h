@@ -11,7 +11,7 @@ void hello();
 int decla(int);
 int fill_hist(const vector<fastjet::PseudoJet> ,const vector<fastjet::PseudoJet> ,
 		const fastjet::PseudoJet ,const fastjet::PseudoJet);
-int save_hist(int);
+int save_hist(int,bool);
 //////////////////////////////////////////////////////////
 // tags
 int recojets(vector<PseudoJet> particles,vector<PseudoJet> & jets, vector<int> & btag, vector<int> & bmistag);

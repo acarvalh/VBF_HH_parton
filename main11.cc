@@ -20,21 +20,37 @@ int main() {
   // Generator. Shorthand for the event.
   Pythia pythia;
   //unsigned const nfiles=4;
-  string path= "/afs/cern.ch/work/a/acarvalh/phenoHH/model_LHEfiles/bulk_graviton/";
-for(unsigned ifile=0; ifile<1; ifile++){
+//  string path= "/afs/cern.ch/work/a/acarvalh/phenoHH/model_LHEfiles/bulk_graviton/";
+//    -1    -1    -1    -1     3     1
+  string path= "/afs/cern.ch/work/a/acarvalh/phenoHH/model_LHEfiles/nonresonantHH/Events/13tev/parton/";
+for(unsigned ifile=4; ifile<6; ifile++){
 //unsigned ifile=0;
-string namefile_in=path + "RSG_WBF_hh-Mhh";
-if(ifile==0) namefile_in += "260.lhe";
-if(ifile==1) namefile_in += "300.lhe";
-if(ifile==2) namefile_in += "350.lhe";
-if(ifile==3) namefile_in += "400.lhe";
-if(ifile==4) namefile_in += "450.lhe";
-if(ifile==5) namefile_in += "500.lhe";
-if(ifile==6) namefile_in += "550.lhe";
+string namefile_in=path + "pp_hh_vbf_";
+if(ifile==0) namefile_in += "BSM_13tev_VBFcuts_CV_p0p5_C2V_p1p0_C3_p1p0.lhe";
+if(ifile==1) namefile_in += "BSM_13tev_VBFcuts_CV_p1p5_C2V_p1p0_C3_p1p0.lhe";
+//
+if(ifile==2) namefile_in += "BSM_13tev_VBFcuts_CV_p1p0_C2V_p2p0_C3_p1p0.lhe";
+if(ifile==3) namefile_in += "BSM_13tev_VBFcuts_CV_p1p0_C2V_p0p0_C3_p1p0.lhe";
+//
+if(ifile==4) namefile_in += "BSM_13tev_VBFcuts_CV_p1p0_C2V_p1p0_C3_p0p0.lhe";
+if(ifile==5) namefile_in += "BSM_13tev_VBFcuts_CV_p1p0_C2V_p1p0_C3_p2p0.lhe";
+//
+if(ifile==6) namefile_in += "BSM_13tev_VBFcuts_CV_p1p0_C2V_p1p0_C3_p1p0.lhe";
+if(ifile==7) namefile_in += "SM_13tev_nocuts.lhe";
+if(ifile==8) namefile_in += "SM_13tev_VBFcuts.lhe";
+/*string namefile_in=path + "Madgraphcg";
+if(ifile==0) namefile_in += "0/MGraviton_260.lhe";
+if(ifile==1) namefile_in += "0/MGraviton_500.lhe";
+if(ifile==2) namefile_in += "1/MGraviton_260.lhe";
+if(ifile==3) namefile_in += "1/MGraviton_500.lhe";
+if(ifile==4) namefile_in += "0_0137/Graviton_Parton/MGraviton_260.lhe";
+if(ifile==5) namefile_in += "0_0137/Graviton_Parton/MGraviton_500.lhe";
+if(ifile==6) namefile_in += "0/MGraviton_260.lhe";
 if(ifile==7) namefile_in += "600.lhe";
 if(ifile==8) namefile_in += "650.lhe";
 if(ifile==9) namefile_in += "700.lhe";
 if(ifile==10) namefile_in += "750.lhe";
+*/
 string namefile_out=namefile_in + ".decayed";
 
     //    string namefile_in=path + "atEightTeV_events_patched.lhe";
@@ -83,6 +99,8 @@ pythia.readString("SLHA:allowUserOverride = off ");
 //pythia.readString("24:onIfMatch = 14 13"); // mu numu
 //pythia.readString("-24:onIfMatch = 12 -11"); // e ve
 //pythia.readString("-24:onIfMatch = 14 -13"); // mu numu
+pythia.readString("1:mayDecay = no");
+pythia.readString("2:mayDecay = no");
 ////////////////////////////////////////////////////////////////////
 pythia.readString("PartonLevel:MI = off"); // Off multiple interactions
 pythia.readString("PartonLevel:ISR = off"); // Shower on

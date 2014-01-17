@@ -1,5 +1,6 @@
 /////////////////////////////////
 // cuts
+double weight =1./20000;
 double HTVBF = 0;//400; 
 double DeltayVBF = 0;//3;
 bool shower=false;
@@ -8,5 +9,6 @@ double const jet_ptmin=20.0; // We cut on all jets below 50 GeV
 double const rapmax=5;
 double const HTmin = 0;
 double const higgs_mass = 125.0;
+double const etab = 2.5;
 // on the 4b's analysis
-double const tolerance=200;
+double const tolerance=10;

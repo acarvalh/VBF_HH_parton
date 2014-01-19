@@ -19,11 +19,15 @@ int main() {
   vector<string> filename;
   string file, path,data;
   int points;
-  if(resonant) {path="bulk_graviton/Madgraph0/MGraviton_"; points = masses;}
+  if(resonant) {
+      path="bulk_graviton/RSG_WBF_hh-Mhh"; points = masses;
+      //path="bulk_graviton/Madgraph0_0137/MGraviton_"; points = masses;
+       
+  }
   else {path="nonresonant/pp_hh_vbf_"; points = parameters;}
   data = ".lhe.decayed";
   
-  for(unsigned i=0;i<points;i++){
+  for(int i=0;i<points;i++){
     if(resonant) {
       ostringstream o;
       o << "" << mass[i];//filenames
@@ -37,16 +41,17 @@ int main() {
   // declare the root plots to be done
   decla(0);
   for(int i=0;i<points;i++){ // for each mass
+//  for(int i=0;i<1;i++){ // for each mass
     cout<<"\n\n reading file = "<<filename.at(i)<<endl;
     in1.open(filename.at(i).c_str());
-    for(unsigned ievent=0;ievent<nevent;ievent++){ // for each event  // 
-//    for(unsigned ievent=0;ievent<2;ievent++){ // for each event  // 
+    for(int ievent=0;ievent<nevent;ievent++){ // for each event  // 
+//    for(int ievent=0;ievent<2;ievent++){ // for each event  // 
         //cout<<"----------------------------------------------------"<<endl;
         string c;
         in1>>c;
         double Px, Py , Pz, E;
         int pID;
-        unsigned nparticles;
+        int nparticles;
         vector<PseudoJet> particles; 
         vector<PseudoJet> neutrinos;          
         vector<PseudoJet> leptons;
@@ -54,7 +59,7 @@ int main() {
         int nb = 0;
         int nvbf = 0;
         in1>>nparticles;  int counter=0; 
-        for(unsigned ipart=0;ipart<nparticles;ipart++){ // loop on particles
+        for(int ipart=0;ipart<nparticles;ipart++){ // loop on particles
           in1 >> pID >> Px >> Py >> Pz >> E ;//>> idup;
           //cout<< pID <<endl;   
           if (abs(pID) < 6 ){  // if a quark/gluon -- neglect hadrons
@@ -72,9 +77,9 @@ int main() {
         // check tags
 	vector<int> btag; vector<int> bmistag; // number of btags/bmistags of each jet entry 
 	vector<int> fattag;
-        int njets = recojets(particles, jets,btag,bmistag);
+        int njets = recojets(particles, jets,btag,bmistag,fattag);
 	//cout<<"njets "<<njets<<endl; 
-        istagged(jets, fattag); // check wheather the jet is fat -- by now only invariant mass
+        //istagged(jets, fattag); // check wheather the jet is fat -- by now only invariant mass
 	// VBF combinatorics and cuts
 	vector<int> vbftag; // keeps the entries of jets that are the VBF, have two entries
 	bool VBF = findVBF(jets, fattag, btag, bmistag, vbftag);

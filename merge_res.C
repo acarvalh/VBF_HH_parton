@@ -62,10 +62,11 @@ TStyle *defaultStyle = new TStyle("defaultStyle","Default Style");
     defaultStyle->cd();
 /////////////////////////////////////////////////////
 
-int nmass = 11;
+int nmass = 33;
 //int mass[nmass]= {300,500,600,700,800,900,1500,2500,3000};
 
 const char* channel[nmass]={
+"histosnonres/Control_shower_1000.root",
 "histos/Control_shower_260.root",
 "histos/Control_shower_300.root",
 "histos/Control_shower_350.root",
@@ -77,24 +78,70 @@ const char* channel[nmass]={
 "histos/Control_shower_650.root",
 "histos/Control_shower_700.root",
 "histos/Control_shower_750.root",
+"histos/Control_shower_800.root",
+"histos/Control_shower_850.root",
+"histos/Control_shower_900.root",
+"histos/Control_shower_950.root",
+"histos/Control_shower_1000.root",
+"histos/Control_shower_1050.root",
+"histos/Control_shower_1100.root",
+"histos/Control_shower_1150.root",
+"histos/Control_shower_1200.root",
+"histos/Control_shower_1250.root",
+"histos/Control_shower_1300.root",
+"histos/Control_shower_1350.root",
+"histos/Control_shower_1400.root",
+"histos/Control_shower_1450.root",
+"histos/Control_shower_1500.root",
+//
+"histos/Madgraph0/Control_shower_260.root",
+"histos/Madgraph0_0137/Control_shower_260.root",
+"histos/Madgraph1/Control_shower_260.root",
+//
+"histos/Madgraph0/Control_shower_500.root",
+"histos/Madgraph0_0137/Control_shower_500.root",
+"histos/Madgraph1/Control_shower_500.root"
 };
 
 //const char* lege[nmass]={"300 GeV","500 GeV","600 GeV","700 GeV","800 GeV","900 GeV","1500 GeV","2500 GeV","3000 GeV"};
 
-const char* lege[nmass]={"260 GeV","300 GeV","350 GeV","400 GeV","450 GeV","500 GeV","550 GeV","600 GeV","650 GeV","700 GeV","750 GeV"};
-//const char* lege[nmass]={"cg=1","cg =0","cg=0.0137","260 GeV","450 GeV","500 GeV","550 GeV","600 GeV","650 GeV","700 GeV","750 GeV"};
-//for (int k=0; k<nmass; k++) channel[k] = Form("Control_shower_%d.root", k);
+const char* lege[nmass]={"SM","260 GeV","300 GeV","350 GeV","400 GeV","450 GeV","calchep 500 GeV",
+                         "550 GeV","600 GeV","650 GeV","700 GeV","750 GeV",
+			 "800 GeV","850 GeV","900 GeV","950 GeV",
+                         "1000 GeV","1050 GeV","1100 GeV","1150 GeV",
+                         "1200 GeV","1250 GeV","1300 GeV","1350 GeV",
+                         "1400 GeV","1450 GeV", "1500 GeV",
+			 "Mad cg=0 (260)","Mad cg=0.0137 (260)","Mad cg=1 (260)",
+			 "Mad cg=0 (500)","Mad cg=0.0137 (500)","Mad cg=1 (500)"
+                        };
+int maxtodo=26; 
+int todo[maxtodo]={ 1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10,
+                      11,12,13,14,15,16,17,18,19,20,
+		      21,22,23,24,25,0};
+//int todo[maxtodo]={0,6,32,31,30};
+double masses[maxtodo] = { 260,300 ,350 ,400 ,450 ,500 ,
+		      550 ,600 ,650 ,700 ,750,
+		      800 ,850 ,900 ,950 ,1000,
+                      1050,1100,1150,1200,1250,
+		      1300,1350,1400,1450,1500};
 
- TLegend *leg = new TLegend(0.75,0.550,0.99,0.99);
+ TLegend *leg = new TLegend(0.55,0.550,0.99,0.99);
    leg->SetTextSize(0.03146853);
    leg->SetLineColor(1);
    leg->SetLineStyle(1);
    leg->SetLineWidth(1);
    leg->SetFillColor(0);
 
+ TLegend *leg2 = new TLegend(0.85,0.550,0.99,0.99);
+   leg2->SetTextSize(0.03146853);
+   leg2->SetLineColor(1);
+   leg2->SetLineStyle(1);
+   leg2->SetLineWidth(1);
+   leg2->SetFillColor(0);
+
  leg->SetHeader("BKG to 8TeV");
 
- int nplots =25;
+ int nplots =26;
  const char* namplots[nplots] = {
            "njets_passing_kLooseID_ct4.png",
            "H1hist.png",
@@ -120,13 +167,15 @@ const char* lege[nmass]={"260 GeV","300 GeV","350 GeV","400 GeV","450 GeV","500 
            "Deta.png",
            "fattag_ct4vbf.png",
            "btag_ct4vbf.png",
-           "bmistag_ct4vbf.png"
+           "bmistag_ct4vbf.png",
+           "cat_ct4.png"
     }; //25
 
-TH1D* plots[nmass][nplots];//[file][plot]
-TFile *file[nmass];
-for(int i=0;i<nmass;i++){
- TFile *file[i] = TFile::Open(channel[i]);
+TH1D* plots[maxtodo][nplots];//[file][plot]
+TFile *file[maxtodo];
+for(int i=0;i<maxtodo;i++){
+ TFile *file[i] = TFile::Open(channel[todo[i]]);
+ cout<<channel[todo[i]]<<endl;
  TH1D* plots[i][0] = (TH1D* ) file[i]->Get("njets_passing_kLooseID_ct4;1"); 
  TH1D* plots[i][1] = (TH1D* ) file[i]->Get("H1hist;1"); 
  TH1D* plots[i][2] = (TH1D* ) file[i]->Get("H1histpt;1"); 
@@ -145,30 +194,28 @@ for(int i=0;i<nmass;i++){
  TH1D* plots[i][15] = (TH1D* ) file[i]->Get("bmistag_ct4;1"); 
  TH1D* plots[i][16] = (TH1D* ) file[i]->Get("j1histpt;1"); 
  TH1D* plots[i][17] = (TH1D* ) file[i]->Get("j1histeta;1"); 
- TH1D* plots[i][18] = (TH1D* ) file[i]->Get("j1histeta;1");//"j2histpt;1"); 
- TH1D* plots[i][19] = (TH1D* ) file[i]->Get("j1histeta;1");//"j2histeta;1"); 
+ TH1D* plots[i][18] = (TH1D* ) file[i]->Get("j2histpt;1");//"j2histpt;1"); 
+ TH1D* plots[i][19] = (TH1D* ) file[i]->Get("j1histpt;1");//"j2histeta;1"); 
  TH1D* plots[i][20] = (TH1D* ) file[i]->Get("RadMass_ct4vbf;1"); 
  TH1D* plots[i][21] = (TH1D* ) file[i]->Get("Deta;1"); 
  TH1D* plots[i][22] = (TH1D* ) file[i]->Get("fattag_ct4vbf;1"); 
  TH1D* plots[i][23] = (TH1D* ) file[i]->Get("btag_ct4vbf;1"); 
  TH1D* plots[i][24] = (TH1D* ) file[i]->Get("bmistag_ct4vbf;1");
+ TH1D* plots[i][25] = (TH1D* ) file[i]->Get("cat_ct4;1");
 } 
 
 const int sigcolor[nmass]={
-	2,3,5,6,7,
-	8,9,11,12,
-	50,227};//,5,6,7,
-	//8,9,11,12,
-	//2,3,5,6,5,8};
-for(int k=0;k<nplots;k++) for(int l=0;l<nmass;l++){
-//plots[0][i]->SetFillColor(kCyan+1);
-//plots[1][i]->SetFillColor(kCyan+2);// terra qcd_30_8TeV_ff.root
-//int k = 0;
-plots[l][k]->SetLineColor(sigcolor[l]);//black qcd_30_8TeV_pf
+	2 ,1  ,5 ,6 ,7 ,
+	8 ,30  ,11,12,70,
+	50,227,5, 6, 7,
+	8, 9, 11, 12,8,
+	2, 3, 5,  6, 5,8,
+        2, 70, 5,  6, 4,50,3};
+
+for(int k=0;k<nplots;k++) for(int l=0;l<maxtodo;l++){
+plots[l][k]->SetLineColor(sigcolor[todo[l]]);
 plots[l][k]->SetLineStyle(0);
 plots[l][k]->SetLineWidth(3);
-
-//
 cout<<"here "<<k<<" "<<l<<endl;
 }
 cout<<"here"<<endl;
@@ -177,62 +224,70 @@ PT_HAT->cd();
 int max=nmass;
 //Double_t nevents[4]={20000.,20000.,20000.,20000.};//20000.,20000.,20000.,20000.};
 double high[nplots]={1.2,1.2,1.2,1.2,1.2,
-		     1.2,1.2,1.2,1.2,1.9,
-		     2.5,1.2,1.2,1.2,1.2,
+		     1.2,1.2,1.2,1.2,40,
 		     1.2,1.2,1.2,1.2,1.2,
-                     1.2,1.2,1.2,1.2,1.2}; 
+		     1.2,1.2,1.7,1.7,1.7,
+                     1.2,1.2,1.2,1.2,1.2,2}; 
+
   for(int i=0;i<nplots;i++) {
   //if(i==16 || i==4 || i==5 || i==6 || i==7  || i==12) PT_HAT->SetLogy(1); else PT_HAT->SetLogy(0);
-	
-	for(int j=0;j<max;j++) leg->AddEntry(plots[j][i],lege[j],"l");
+
+	for(int j=0;j<maxtodo;j++) {
+        leg->AddEntry(plots[j][i],lege[todo[j]],"l");
+        cout<<"here "<<j<<" "<<i<<endl;
+        }
 	//plots[0][i].Scale(plots[0][i].Integral());
         //plots[0][i].Scale(nevents[j]);
-	plots[0][i].SetMaximum(high[j]*plots[0][i].GetMaximum());
+	plots[0][i].SetMaximum(high[i]*plots[0][i].GetMaximum());
 	plots[0][i].Draw("Hist");
 	leg->Draw("same");
-	for(int j=1;j<max;j++) {
+	for(int j=1;j<maxtodo;j++) {
         //	plots[j][i].Scale(nevents[j]);
 		//plots[j][i].Scale(plots[j][i].Integral());
 		plots[j][i].Draw("Hist,same");
 	
 	}
-	
+	if(i==9) {
+           PT_HAT->SetLogy(1); 
+           TLine li(500,0.00001,500,0.001);
+           li->Draw("same");
+        } else PT_HAT->SetLogy(0); 	
 	PT_HAT->SaveAs(namplots[i]);
 	PT_HAT->Clear();
 	leg->Clear();
   }
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 // njets plot
 vector<double> nj3,nj4,nj5,nj6,nj7,nj8,nj9,nj10,njmore,ntot;
-    for(int j=0;j<max;j++) {
+    for(int j=0;j<maxtodo;j++) {
+       cout<<lege[todo[j]]<<endl;
        // get number of njets
        int nbins = plots[j][0].GetNbinsX();
        //cout<<nbins<<endl;
        for(int k=0;k<nbins;k++) {
 	double njets = plots[j][0].GetBinContent(k); 
-        if (k == 3)      {nj3.push_back(njets); cout<<"3 jets "<<nj3[j]<<endl;}
-        else if (k == 4) {nj4.push_back(njets); cout<<"4 jets "<<nj4[j]<<endl;}
-        else if (k == 5) {nj5.push_back(njets); cout<<"5 jets "<<nj5[j]<<endl;}
-        else if (k == 6) {nj6.push_back(njets); cout<<"6 jets "<<nj6[j]<<endl;}
-        else if (k == 7) {nj7.push_back(njets); cout<<"7 jets "<<nj7[j]<<endl;}
-        else if (k == 8) {nj8.push_back(njets); cout<<"8 jets "<<nj8[j]<<endl;}
-        else if (k == 9) {nj9.push_back(njets); cout<<"9 jets "<<nj9[j]<<endl;}
-        else if (k == 10) {nj10.push_back(njets); cout<<"10 jets "<<nj10[j]<<endl;}
+        if (k == 2)      {nj3.push_back(njets); cout<<"3 jets "<<nj3[j]<<endl;}
+        else if (k == 3) {nj4.push_back(njets); cout<<"4 jets "<<nj4[j]<<endl;}
+        else if (k == 4) {nj5.push_back(njets); cout<<"5 jets "<<nj5[j]<<endl;}
+        else if (k == 5) {nj6.push_back(njets); cout<<"6 jets "<<nj6[j]<<endl;}
+        else if (k == 6) {nj7.push_back(njets); cout<<"7 jets "<<nj7[j]<<endl;}
+        else if (k == 7) {nj8.push_back(njets); cout<<"8 jets "<<nj8[j]<<endl;}
+        else if (k == 8) {nj9.push_back(njets); cout<<"9 jets "<<nj9[j]<<endl;}
+        else if (k == 9) {nj10.push_back(njets); cout<<"10 jets "<<nj10[j]<<endl;}
         else {njmore.push_back(njets); cout<<"more "<< k<<" "<<njmore[j]<<endl;}
        } // close for bins
        ntot.push_back(nj3[j]+nj4[j]+nj5[j]+nj6[j]+nj7[j]+nj8[j]+nj9[j]+nj10[j]+njmore[j]);
        cout<<"total "<<ntot[j]<<endl;
    } // close for masses
-   int masses[nmass] = {260,300,350,400,450,500,550,600,650,700,750};
    TMultiGraph *mg = new TMultiGraph();
-   int nevents=20000;
+   int nevents=1.;//20000;
    //
    TGraphErrors *TreeJets = new TGraphErrors(1);
    TreeJets->SetMarkerStyle(kFullDotLarge); 
    TreeJets->SetLineColor(kMagenta);
    TreeJets->SetMarkerColor(kMagenta);
    TreeJets->SetLineWidth(3);
-   for(int j=0;j<max;j++) TreeJets->SetPoint(j, masses[j], nj3[j]/nevents);
+   for(int j=0;j<maxtodo-1;j++) TreeJets->SetPoint(j, masses[j], nj3[j]/nevents);
    //mg->Add(TreeJets,"L,P");//->Draw("L,P");
    //leg->AddEntry(TreeJets, " 3 jets", "LP");
    //
@@ -241,86 +296,150 @@ vector<double> nj3,nj4,nj5,nj6,nj7,nj8,nj9,nj10,njmore,ntot;
    fourJets->SetLineColor(8);
    fourJets->SetMarkerColor(8);
    fourJets->SetLineWidth(3);
-   for(int j=0;j<max;j++) fourJets->SetPoint(j, masses[j], nj4[j]/nevents);
+   for(int j=0;j<maxtodo-1;j++) fourJets->SetPoint(j, masses[j], nj4[j]/nevents);
    mg->Add(fourJets,"L,P");//->Draw("L,P");
-   leg->AddEntry(fourJets, " 4 jets", "LP");
+   leg2->AddEntry(fourJets, " 4 jets", "LP");
    //
    TGraphErrors *fiveJets = new TGraphErrors(1);
    fiveJets->SetMarkerStyle(kFullDotLarge); 
    fiveJets->SetLineColor(kCyan);
    fiveJets->SetMarkerColor(kCyan);
    fiveJets->SetLineWidth(3);
-   for(int j=0;j<max;j++) fiveJets->SetPoint(j, masses[j], nj5[j]/nevents);
+   for(int j=0;j<maxtodo-1;j++) fiveJets->SetPoint(j, masses[j], nj5[j]/nevents);
    mg->Add(fiveJets,"L,P");//->Draw("L,P");
-   leg->AddEntry(fiveJets, " 5 jets", "LP");
+   leg2->AddEntry(fiveJets, " 5 jets", "LP");
    //
    TGraphErrors *sixJets = new TGraphErrors(1);
    sixJets->SetMarkerStyle(kFullDotLarge); 
    sixJets->SetLineColor(kBlue);
    sixJets->SetMarkerColor(kBlue);
    sixJets->SetLineWidth(3);
-   for(int j=0;j<max;j++) sixJets->SetPoint(j, masses[j], nj6[j]/nevents);
+   for(int j=0;j<maxtodo-1;j++) sixJets->SetPoint(j, masses[j], nj6[j]/nevents);
    mg->Add(sixJets,"L,P");//->Draw("L,P");
-   leg->AddEntry(sixJets, " 6 jets", "LP");
+   leg2->AddEntry(sixJets, " 6 jets", "LP");
    //
    TGraphErrors *sevenJets = new TGraphErrors(1);
    sevenJets->SetMarkerStyle(kFullDotLarge); 
    sevenJets->SetLineColor(kMagenta);
    sevenJets->SetMarkerColor(kMagenta);
    sevenJets->SetLineWidth(3);
-   for(int j=0;j<max;j++) sevenJets->SetPoint(j, masses[j], nj7[j]/nevents);
+   for(int j=0;j<maxtodo-1;j++) sevenJets->SetPoint(j, masses[j], nj7[j]/nevents);
    mg->Add(sevenJets,"L,P");//->Draw("L,P");
-   leg->AddEntry(sevenJets, " 7 jets", "LP");
+   leg2->AddEntry(sevenJets, " 7 jets", "LP");
    //
    TGraphErrors *eightJets = new TGraphErrors(1);
    eightJets->SetMarkerStyle(kFullDotLarge); 
    eightJets->SetLineColor(kGreen);
    eightJets->SetMarkerColor(kGreen);
    eightJets->SetLineWidth(3);
-   for(int j=0;j<max;j++) eightJets->SetPoint(j, masses[j], nj8[j]/nevents);
+   for(int j=0;j<maxtodo-1;j++) eightJets->SetPoint(j, masses[j], nj8[j]/nevents);
    mg->Add(eightJets,"L,P");//->Draw("L,P");
-   leg->AddEntry(eightJets, " 8 jets", "LP");
+   leg2->AddEntry(eightJets, " 8 jets", "LP");
    //
    TGraphErrors *nineJets = new TGraphErrors(1);
    nineJets->SetMarkerStyle(kFullDotLarge); 
    nineJets->SetLineColor(50);
    nineJets->SetMarkerColor(50);
    nineJets->SetLineWidth(3);
-   for(int j=0;j<max;j++) nineJets->SetPoint(j, masses[j], nj9[j]/nevents);
+   for(int j=0;j<maxtodo-1;j++) nineJets->SetPoint(j, masses[j], nj9[j]/nevents);
    mg->Add(nineJets,"L,P");//->Draw("L,P");
-   leg->AddEntry(nineJets, " 9 jets", "LP");
+   leg2->AddEntry(nineJets, " 9 jets", "LP");
    //
    TGraphErrors *tenJets = new TGraphErrors(1);
    tenJets->SetMarkerStyle(kFullDotLarge); 
    tenJets->SetLineColor(kGray);
    tenJets->SetMarkerColor(kGray);
    tenJets->SetLineWidth(3);
-   for(int j=0;j<max;j++) tenJets->SetPoint(j, masses[j], nj10[j]/nevents);
+   for(int j=0;j<maxtodo;j++) tenJets->SetPoint(j, masses[j], nj10[j]/nevents);
    mg->Add(tenJets,"L,P");//->Draw("L,P");
-   leg->AddEntry(tenJets, " 10 jets", "LP");
+   leg2->AddEntry(tenJets, " 10 jets", "LP");
    //
    TGraphErrors *moreJets = new TGraphErrors(1);
    moreJets->SetMarkerStyle(kFullDotLarge); 
    moreJets->SetLineColor(kPink);
    moreJets->SetMarkerColor(kPink);
    moreJets->SetLineWidth(3);
-   for(int j=0;j<max;j++) moreJets->SetPoint(j, masses[j], njmore[j]/nevents);
+   for(int j=0;j<maxtodo-1;j++) moreJets->SetPoint(j, masses[j], njmore[j]/nevents);
    mg->Add(moreJets,"L,P");//->Draw("L,P");
-   leg->AddEntry(moreJets, " > 6 jets", "LP");
+   leg2->AddEntry(moreJets, " > 10 jets", "LP");
    //
    TGraphErrors *totJets = new TGraphErrors(1);
    totJets->SetMarkerStyle(kFullDotLarge); 
    totJets->SetLineColor(kBlack);
    totJets->SetMarkerColor(kBlack);
    totJets->SetLineWidth(3);
-   for(int j=0;j<max;j++) totJets->SetPoint(j, masses[j], ntot[j]/nevents);
+   for(int j=0;j<maxtodo-1;j++) totJets->SetPoint(j, masses[j], ntot[j]/nevents);
    mg->Add(totJets,"L,P");//->Draw("L,P");
-   leg->AddEntry(totJets, " total", "LP");
+   leg2->AddEntry(totJets, " total", "LP");
    //
   mg->Draw("AP");
-  leg->Draw();
+  leg2->Draw();
   PT_HAT->SetLogy(0);
   PT_HAT->SaveAs("njets_flat.png");
+  PT_HAT->Clear();
+  leg2->Clear();
+//////////////////////////////////////////////////////////////////////
+// cat plot
+   TMultiGraph *mg1 = new TMultiGraph();
+   int nevents=1;//20000;
+   vector<double> cat0,cat1,cat2,ctot;
+    for(int j=0;j<maxtodo;j++) {
+       cout<<lege[todo[j]]<<endl;
+       // get number of njets
+       int nbins = plots[j][25].GetNbinsX();
+       //cout<<nbins<<endl;
+       for(int k=0;k<nbins;k++) {
+	double njets = plots[j][25].GetBinContent(k); 
+        if (k == 2)      {cat0.push_back(njets); cout<<"0 tag "<<cat0[j]<<endl;}
+        else if (k == 3) {cat1.push_back(njets); cout<<"1 tag "<<cat1[j]<<endl;}
+        else if (k == 4) {cat2.push_back(njets); cout<<"2 tag "<<cat2[j]<<endl;}
+       } // close for bins
+       ctot.push_back(cat0[j]+cat1[j]+cat2[j]);
+       cout<<"total "<<ctot[j]<<endl;
+   } // close for masses
+   TMultiGraph *mg = new TMultiGraph();
+   //
+   TGraphErrors *cat0Jets = new TGraphErrors(1);
+   cat0Jets->SetMarkerStyle(kFullDotLarge); 
+   cat0Jets->SetLineColor(kMagenta);
+   cat0Jets->SetMarkerColor(kMagenta);
+   cat0Jets->SetLineWidth(3);
+   for(int j=0;j<maxtodo-1;j++) cat0Jets->SetPoint(j, masses[j], cat0[j]/nevents);
+   mg1->Add(cat0Jets,"L,P");//->Draw("L,P");
+   mg1.SetMaximum(1.1);
+   leg2->AddEntry(cat0Jets, " 0 tag", "LP");
+   //
+   TGraphErrors *cat1Jets = new TGraphErrors(1);
+   cat1Jets->SetMarkerStyle(kFullDotLarge); 
+   cat1Jets->SetLineColor(8);
+   cat1Jets->SetMarkerColor(8);
+   cat1Jets->SetLineWidth(3);
+   for(int j=0;j<maxtodo-1;j++) cat1Jets->SetPoint(j, masses[j], cat1[j]/nevents);
+   mg1->Add(cat1Jets,"L,P");//->Draw("L,P");
+   leg2->AddEntry(cat1Jets, " 1 tag", "LP");
+   //
+   TGraphErrors *cat2Jets = new TGraphErrors(1);
+   cat2Jets->SetMarkerStyle(kFullDotLarge); 
+   cat2Jets->SetLineColor(kCyan);
+   cat2Jets->SetMarkerColor(kCyan);
+   cat2Jets->SetLineWidth(3);
+   for(int j=0;j<maxtodo-1;j++) cat2Jets->SetPoint(j, masses[j], cat2[j]/nevents);
+   mg1->Add(cat2Jets,"L,P");//->Draw("L,P");
+   leg2->AddEntry(cat2Jets, " 2 tags", "LP");
+   //
+   TGraphErrors *totJets = new TGraphErrors(1);
+   totJets->SetMarkerStyle(kFullDotLarge); 
+   totJets->SetLineColor(1);
+   totJets->SetMarkerColor(1);
+   totJets->SetLineWidth(3);
+   for(int j=0;j<maxtodo-1;j++) totJets->SetPoint(j, masses[j], ctot[j]/nevents);
+   mg1->Add(totJets,"L,P");//->Draw("L,P");
+   leg2->AddEntry(totJets, " total", "LP");
+   //
+  mg1->Draw("AP");
+  leg2->Draw();
+  PT_HAT->SetLogy(0);
+  PT_HAT->SaveAs("fatcat.png");
 //PT_HAT->Close(); 
 
 }

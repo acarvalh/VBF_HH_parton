@@ -14,8 +14,8 @@ int fill_hist(const vector<fastjet::PseudoJet> ,const vector<fastjet::PseudoJet>
 int save_hist(int,bool);
 //////////////////////////////////////////////////////////
 // tags
-int recojets(vector<PseudoJet> particles,vector<PseudoJet> & jets, vector<int> & btag, vector<int> & bmistag);
-void istagged(vector<PseudoJet> jets, vector<int> & fattag);
+int recojets(vector<PseudoJet> particles,vector<PseudoJet> & jets, vector<int> & btag, vector<int> & bmistag, vector<int> & fattag);
+//void istagged(vector<PseudoJet> jets, vector<int> & fattag);
 bool findVBF(vector<PseudoJet> jets, vector<int> fattag, vector<int> btag, vector<int> bmistag,vector<int> & vbftag);
 /////////////////////////////////////////////////////////////
 // analysis

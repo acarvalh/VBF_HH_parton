@@ -311,13 +311,14 @@ void istagged(vector<PseudoJet> jets, vector<int> & fattag){
 } // close istagged
 /////////////////////////////////////////////////////////////////////////
 // save the histos
-int save_hist(int nmass, bool resonant){
+int save_hist(int nmass, bool resonant,bool bkg){
   const char* Mass;
-  if(resonant) {
+  if(resonant && !bkg) {
     Mass = Form("histos/Control_shower_%d.root",nmass);
     //Mass = Form("histos/Madgraph0_0137/Control_shower_%d.root",nmass);
   }
-  else Mass = Form("histosnonres/Control_shower_%d.root",nmass);
+  else if(!bkg) Mass = Form("histosnonres/Control_shower_%d.root",nmass);
+  else Mass = Form("4bsbkg/Control_shower_%d.root",nmass);
   TFile f1(Mass, "recreate");
   f1.cd();
   Njets_passing_kLooseID->Write();

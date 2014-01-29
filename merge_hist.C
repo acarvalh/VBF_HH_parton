@@ -62,7 +62,7 @@ TStyle *defaultStyle = new TStyle("defaultStyle","Default Style");
     defaultStyle->cd();
 /////////////////////////////////////////////////////
 
-int nmass = 9;
+int nmass = 11;
 //int mass[nmass]= {300,500,600,700,800,900,1500,2500,3000};
 
 const char* channel[nmass]={
@@ -77,7 +77,9 @@ const char* channel[nmass]={
 "histosnonres/Control_shower_102010.root",
 //
 "histosnonres/Control_shower_101000.root",
-"histosnonres/Control_shower_101020.root"
+"histosnonres/Control_shower_101020.root",
+"4bsbkg/Control_shower_0.root",
+"4bsbkg/Control_shower_1.root"
 };
 const char* lege[nmass]={
 "SM",
@@ -91,15 +93,18 @@ const char* lege[nmass]={
 "CV=1 C2V=0 C3=1",
 //
 "CV=1 C2V=1 C3=0",
-"CV=1 C2V=1 C3=2"
+"CV=1 C2V=1 C3=2",
+"Z(bb) bb jj",
+"Z(bb) Z(bb) jj"
 };
 
-int maxtodo=7; 
-//int todo[maxtodo]={0,1,2};
+int maxtodo=3; 
+int todo[maxtodo]={1,9,10};
 //int todo[maxtodo]={1,7,8};
-int todo[maxtodo]={2,3,4,5,6,7,8};
+//int todo[maxtodo]={2,3,4,5,6,7,8};
 //double masses[maxtodo] = {0,1,2};//,650,700,750};
-double masses[maxtodo] = {0,1,2,3,4,5,6};//,650,700,750};
+//double masses[maxtodo] = {0,1,2,3,4,5,6};//,650,700,750};
+double masses[maxtodo] = {0,1,2};//,650,700,750};
 
  TLegend *leg = new TLegend(0.55,0.550,0.99,0.99);
    leg->SetTextSize(0.03146853);
@@ -183,7 +188,7 @@ for(int i=0;i<maxtodo;i++){
 
 const int sigcolor[nmass]={
 	2,3,5,6,7,
-	8,9,11,12};//,
+	8,9,11,12,50,227};//,
 	//50,227};//,5,6,7,
 	//8,9,11,12,
 	//2,3,5,6,5,8};
@@ -210,7 +215,7 @@ double high[nplots]={1.2,1.2,4.2,2.1,1.2,
 	for(int j=0;j<maxtodo;j++) leg->AddEntry(plots[j][i],lege[todo[j]],"l");
 	//plots[0][i].Scale(plots[0][i].Integral());
         //plots[0][i].Scale(nevents[j]);
-	plots[0][i].SetMaximum(high[i]*plots[todo[0]][i].GetMaximum());
+	plots[0][i].SetMaximum(high[i]*plots[0][i].GetMaximum());
 	plots[0][i].Draw("Hist");
 	leg->Draw("same");
 	for(int j=1;j<maxtodo;j++) {

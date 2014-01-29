@@ -1,8 +1,16 @@
 // inputs
-int const nevent=50000;
+int const nevent=10000;
 // Analysis
 bool fourb=true;
 bool resonant=false;
+bool bkg = true;
+// for bkg
+int const components =2;
+int comp[components] = {0,1}; 
+string bkgfilenames[components]={
+"zbbbbjj_unweighted_events",
+"zbbzbbjj_unweighted_events"
+};
 // for nonresonant
 int const parameters=9;
 int parameter[parameters]={

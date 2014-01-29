@@ -1,6 +1,6 @@
 //////////////////
 // to run:
-// make HH_VBF.cc
+// make HH_VBF
 /////////////////
 #include "fastjet/ClusterSequence.hh"
 #include "fastjet/Selector.hh"
@@ -19,12 +19,13 @@ int main() {
   vector<string> filename;
   string file, path,data;
   int points;
-  if(resonant) {
+  if(resonant && !bkg) {
       path="bulk_graviton/RSG_WBF_hh-Mhh"; points = masses;
       //path="bulk_graviton/Madgraph0_0137/MGraviton_"; points = masses;
        
   }
-  else {path="nonresonant/pp_hh_vbf_"; points = parameters;}
+  else if (!bkg) {path="nonresonant/pp_hh_vbf_"; points = parameters;}
+  else {path="4bsbkg/"; points = components;}
   data = ".lhe.decayed";
   
   for(int i=0;i<points;i++){
@@ -32,7 +33,8 @@ int main() {
       ostringstream o;
       o << "" << mass[i];//filenames
       file = path + o.str() + data;
-    } else file = path + filenames[i] + data;
+    } else if(!bkg) file = path + filenames[i] + data;
+    else file = path + bkgfilenames[i] + data;
     filename.push_back(file);
     cout<<" "<<points<<" "<<i<<" "<<filename.at(i)<<endl;
   } // close filename
@@ -90,7 +92,9 @@ int main() {
 	  if(fourb) reco = analyse_4b(jets,fattag,btag,bmistag,vbftag);
         } // close pass VBF
     } // close for event
-    if(resonant) save_hist(mass[i],resonant); else save_hist(parameter[i],resonant);
+    if(resonant && !bkg) save_hist(mass[i],resonant,bkg); 
+    else if(!bkg) save_hist(parameter[i],resonant,bkg);
+    else save_hist(comp[i],resonant,bkg);
     in1.close();
   } // close for each mass
 }

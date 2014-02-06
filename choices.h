@@ -1,9 +1,10 @@
 // inputs
-int const nevent=10000;
 // Analysis
 bool fourb=true;
-bool resonant=false;
-bool bkg = true;
+bool resonant=true;
+bool bkg = false;
+//
+int const nevent=20000;
 // for bkg
 int const components =2;
 int comp[components] = {0,1}; 

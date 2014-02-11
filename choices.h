@@ -6,24 +6,33 @@ bool bkg = false;
 //
 int const nevent=20000;
 // for bkg
-int const components =2;
-int comp[components] = {0,1}; 
+int const components =11;
+int comp[components] = {0,1,2,3,4,5,6,7,8,9,10}; 
 string bkgfilenames[components]={
-"zbbbbjj_unweighted_events",
-"zbbzbbjj_unweighted_events"
+"zbbbbjj_unweighted_events", // 10k
+"zbbzbbjj_unweighted_events", // 10k
+"dd__4bdd", // 10k
+"gg__4bddbar", // 10k
+"gg__4buubar", // 10k
+"ud__4bud", // 10k
+"BBBBjj_run3", // 10k
+"uu__4buu", // 2.3k events
+"4b2j_alpgen", //500 k
+"t_wbt_wbjj", // 100kevents
+"wwbbjj_ptb20" // 10k
 };
 // for nonresonant
 int const parameters=9;
 int parameter[parameters]={
-1001,1000,101010,
+101010,1000,1001,
 51010,151010,
 100010,102010,
 101000,101020
 };
 string filenames[parameters]={
-"SM_13tev_nocuts",
-"SM_13tev_VBFcuts",
 "BSM_13tev_VBFcuts_CV_p1p0_C2V_p1p0_C3_p1p0",
+"SM_13tev_VBFcuts",
+"SM_13tev_nocuts",
 //
 "BSM_13tev_VBFcuts_CV_p0p5_C2V_p1p0_C3_p1p0",
 "BSM_13tev_VBFcuts_CV_p1p5_C2V_p1p0_C3_p1p0",

@@ -21,10 +21,11 @@ int main() {
   int points;
   if(resonant && !bkg) {
       //path="bulk_graviton/RSG_WBF_hh-Mhh"; points = masses;
-      path="bulk_graviton_mad/MGraviton_"; points = masses;
-       
+      if(fourb) path="bulk_graviton_mad/MGraviton_"; points = masses;
+      if(!fourb) path="bulk_graviton_mad_WWbb/MGraviton_"; points = masses;       
   }
-  else if (!bkg) {path="nonresonant/pp_hh_vbf_"; points = parameters;}
+  else if (!bkg && fourb) {path="nonresonant/pp_hh_vbf_"; points = parameters;}//nonresWWbb
+  else if (!bkg && !fourb) {path="nonresWWbb/pp_hh_vbf_"; points = parameters;}//
   else {path="4bsbkg/"; points = components;}
   data = ".lhe.decayed";
   
@@ -43,11 +44,13 @@ int main() {
   // declare the root plots to be done
   decla(0);
   for(int i=0;i<points;i++){ // for each mass
-//  for(int i=2;i<3;i++){ // for each mass
+//  for(int i=24;i<26;i++){ // for each mass
+//  for(int i=8;i<9;i++){ // for each mass
+//  for(int i=10;i<15;i++){ // for each mass
     cout<<"\n\n reading file = "<<filename.at(i)<<endl;
     in1.open(filename.at(i).c_str());
     for(int ievent=0;ievent<nevent;ievent++){ // for each event  // 
-//    for(int ievent=0;ievent<2;ievent++){ // for each event  // 
+//    for(int ievent=0;ievent<20;ievent++){ // for each event  // 
         //cout<<"----------------------------------------------------"<<endl;
         string c;
         in1>>c;
@@ -65,7 +68,7 @@ int main() {
         for(int ipart=0;ipart<nparticles;ipart++){ // loop on particles
           in1 >> pID >> Px >> Py >> Pz >> E ;//>> idup;
           //cout<< pID <<endl;   
-          if (abs(pID) < 6 ){  // if a quark/gluon -- neglect hadrons
+          if (abs(pID) < 6 || pID==21){  // if a quark/gluon -- neglect hadrons
 		particles.push_back(fastjet::PseudoJet(Px,Py,Pz,E)); 
                 particles.at(counter).set_user_index(pID); 
 		if(abs(pID) == 5) nb++; else nvbf++; // count b's and no-b's
@@ -86,7 +89,7 @@ int main() {
         //if(nb!=4) {cout<<"not correct b quarks number "<<nb<<endl; exit(-10); }
 	if(counterh==2) genhiggs(counterh, higgses);
         // construct the jets
-        //cout<<"number of b particles = "<< nb<<endl;
+        //cout<<"number of b particles = "<< nb<<" number of leptons = "<< counterl<<" number of neutrinos = "<< countern<<" number of jets = "<< nvbf<<" event "<< ievent<<endl;
         //cout<<"number of non-b particles = "<< nvbf<<endl;
 	vector<PseudoJet> jets; 
         // check tags
@@ -102,14 +105,14 @@ int main() {
 	  //vector<int> H1;
 	  //vector<int> H2;
 	  bool reco=false;
-	  if(fourb) reco = analyse_4b(jets,fattag,btag,bmistag,vbftag);
-          else if (counterl>1 && counterl>1) reco = analyse_2b2w(jets,fattag,btag,bmistag,vbftag,leptons,neutrinos);
+	  if(fourb) {reco = analyse_4b(jets,fattag,btag,bmistag,vbftag,mass[i]);}
+          else if (counterl>1 && countern>1) reco = analyse_2b2w(jets,fattag,btag,bmistag,vbftag,leptons,neutrinos);
         } // close pass VBF
         //else cout<<"vbf loose"<<endl;
     } // close for event
-    if(resonant && !bkg) save_hist(mass[i],resonant,bkg); 
-    else if(!bkg) save_hist(parameter[i],resonant,bkg);
-    else save_hist(comp[i],resonant,bkg);
+    if(resonant && !bkg) save_hist(mass[i],resonant,bkg,fourb); 
+    else if(!bkg) save_hist(parameter[i],resonant,bkg,fourb);
+    else save_hist(comp[i],resonant,bkg,fourb);
     in1.close();
   } // close for each mass
 }

@@ -61,71 +61,124 @@ TStyle *defaultStyle = new TStyle("defaultStyle","Default Style");
     defaultStyle->SetPadTickY(1);
     defaultStyle->cd();
 /////////////////////////////////////////////////////
-
-int nmass = 33;
+int nmass = 64;
 //int mass[nmass]= {300,500,600,700,800,900,1500,2500,3000};
 
 const char* channel[nmass]={
 "histosnonres/Control_shower_1000.root",
-"histos/Control_shower_260.root",
-"histos/Control_shower_300.root",
-"histos/Control_shower_350.root",
-"histos/Control_shower_400.root",
-"histos/Control_shower_450.root",
-"histos/Control_shower_500.root",
-"histos/Control_shower_550.root",
-"histos/Control_shower_600.root",
-"histos/Control_shower_650.root",
-"histos/Control_shower_700.root",
-"histos/Control_shower_750.root",
-"histos/Control_shower_800.root",
-"histos/Control_shower_850.root",
-"histos/Control_shower_900.root",
-"histos/Control_shower_950.root",
-"histos/Control_shower_1000.root",
-"histos/Control_shower_1050.root",
-"histos/Control_shower_1100.root",
-"histos/Control_shower_1150.root",
-"histos/Control_shower_1200.root",
-"histos/Control_shower_1250.root",
-"histos/Control_shower_1300.root",
-"histos/Control_shower_1350.root",
-"histos/Control_shower_1400.root",
-"histos/Control_shower_1450.root",
-"histos/Control_shower_1500.root",
+"bulk_graviton_mad/Control_shower_260.root",
+"bulk_graviton_mad/Control_shower_300.root",
+"bulk_graviton_mad/Control_shower_350.root",
+"bulk_graviton_mad/Control_shower_400.root",
+"bulk_graviton_mad/Control_shower_450.root",
+"bulk_graviton_mad/Control_shower_500.root",
+"bulk_graviton_mad/Control_shower_550.root",
+"bulk_graviton_mad/Control_shower_550.root",
+"bulk_graviton_mad/Control_shower_550.root",
+"bulk_graviton_mad/Control_shower_700.root",
+"bulk_graviton_mad/Control_shower_750.root",
+"bulk_graviton_mad/Control_shower_800.root",
+"bulk_graviton_mad/Control_shower_850.root",
+"bulk_graviton_mad/Control_shower_900.root",
+"bulk_graviton_mad/Control_shower_950.root",
+"bulk_graviton_mad/Control_shower_1000.root",
+"bulk_graviton_mad/Control_shower_1050.root",
+"bulk_graviton_mad/Control_shower_1100.root",
+"bulk_graviton_mad/Control_shower_1150.root",
+"bulk_graviton_mad/Control_shower_1200.root",
+"bulk_graviton_mad/Control_shower_1250.root",
+"bulk_graviton_mad/Control_shower_1300.root",
+"bulk_graviton_mad/Control_shower_1350.root",
+"bulk_graviton_mad/Control_shower_1400.root",
+"bulk_graviton_mad/Control_shower_1450.root",
+"bulk_graviton_mad/Control_shower_1500.root",
+// bkgs 4b
+"4bsbkg/Control_shower_0.root",
+"4bsbkg/Control_shower_1.root",
+"4bsbkg/Control_shower_2.root",
+"4bsbkg/Control_shower_3.root",
+"4bsbkg/Control_shower_4.root",
+"4bsbkg/Control_shower_5.root",
+"4bsbkg/Control_shower_7.root",
+"4bsbkg/Control_shower_8.root",
 //
-"histos/Madgraph0/Control_shower_260.root",
-"histos/Madgraph0_0137/Control_shower_260.root",
-"histos/Madgraph1/Control_shower_260.root",
+// WWbb
+"histosnonres/Control_shower_1000.root",
+"bulk_graviton_mad_WWbb/Control_shower_260.root",
+"bulk_graviton_mad_WWbb/Control_shower_300.root",
+"bulk_graviton_mad_WWbb/Control_shower_350.root",
+"bulk_graviton_mad_WWbb/Control_shower_400.root",
+"bulk_graviton_mad_WWbb/Control_shower_450.root",
+"bulk_graviton_mad_WWbb/Control_shower_500.root",
+"bulk_graviton_mad_WWbb/Control_shower_550.root",
+"bulk_graviton_mad_WWbb/Control_shower_550.root",
+"bulk_graviton_mad_WWbb/Control_shower_550.root",
+"bulk_graviton_mad_WWbb/Control_shower_700.root",
+"bulk_graviton_mad_WWbb/Control_shower_750.root",
+"bulk_graviton_mad_WWbb/Control_shower_800.root",
+"bulk_graviton_mad_WWbb/Control_shower_850.root",
+"bulk_graviton_mad_WWbb/Control_shower_900.root",
+"bulk_graviton_mad_WWbb/Control_shower_950.root",
+"bulk_graviton_mad_WWbb/Control_shower_1000.root",
+"bulk_graviton_mad_WWbb/Control_shower_1050.root",
+"bulk_graviton_mad_WWbb/Control_shower_1100.root",
+"bulk_graviton_mad_WWbb/Control_shower_1150.root",
+"bulk_graviton_mad_WWbb/Control_shower_1200.root",
+"bulk_graviton_mad_WWbb/Control_shower_1250.root",
+"bulk_graviton_mad_WWbb/Control_shower_1300.root",
+"bulk_graviton_mad_WWbb/Control_shower_1350.root",
+"bulk_graviton_mad_WWbb/Control_shower_1400.root",
+"bulk_graviton_mad_WWbb/Control_shower_1450.root",
+"bulk_graviton_mad_WWbb/Control_shower_1500.root",
+// WWbb BKG
+"4bsbkg/Control_shower_9.root",
+"4bsbkg/Control_shower_10.root"
+//"histos/Madgraph0/Control_shower_260.root",
+//"histos/Madgraph0_0137/Control_shower_260.root",
+//"histos/Madgraph1/Control_shower_260.root",
 //
-"histos/Madgraph0/Control_shower_500.root",
-"histos/Madgraph0_0137/Control_shower_500.root",
-"histos/Madgraph1/Control_shower_500.root"
+//"histos/Madgraph0/Control_shower_500.root",
+//"histos/Madgraph0_0137/Control_shower_500.root",
+//"histos/Madgraph1/Control_shower_500.root"
 };
 
 //const char* lege[nmass]={"300 GeV","500 GeV","600 GeV","700 GeV","800 GeV","900 GeV","1500 GeV","2500 GeV","3000 GeV"};
 
-const char* lege[nmass]={"SM","260 GeV","300 GeV","350 GeV","400 GeV","450 GeV","calchep 500 GeV",
+const char* lege[nmass]={"SM HH","260 GeV","300 GeV 4b","350 GeV 4b","400 GeV 4b","450 GeV 4b","calchep 500 GeV 4b",
+                         "550 GeV 4b","600 GeV 4b","650 GeV 4b","700 GeV 4b","750 GeV 4b",
+			 "800 GeV 4b","850 GeV 4b","900 GeV 4b","950 GeV",
+                         "1000 GeV","1050 GeV","1100 GeV","1150 GeV",
+                         "1200 GeV","1250 GeV","1300 GeV","1350 GeV",
+                         "1400 GeV","1450 GeV", "1500 GeV",
+			"zbbbb jj", // 10k
+			"zbbzbb jj", // 10k
+			"dd> 4bdd", // 10k
+			"gg> 4bddbar", // 10k
+			"gg> 4buubar", // 10k
+			"ud> 4bud", // 10k
+			"uu> 4buu", // 2.3k events
+			"4b2j alpgen",
+                        "SM HH","260 GeV","300 GeV","350 GeV","400 GeV","450 GeV","calchep 500 GeV",
                          "550 GeV","600 GeV","650 GeV","700 GeV","750 GeV",
 			 "800 GeV","850 GeV","900 GeV","950 GeV",
                          "1000 GeV","1050 GeV","1100 GeV","1150 GeV",
                          "1200 GeV","1250 GeV","1300 GeV","1350 GeV",
                          "1400 GeV","1450 GeV", "1500 GeV",
-			 "Mad cg=0 (260)","Mad cg=0.0137 (260)","Mad cg=1 (260)",
-			 "Mad cg=0 (500)","Mad cg=0.0137 (500)","Mad cg=1 (500)"
+			"t(wb)t(wb) jj", // 100kevents
+			"wwbb jj" // 10k
+			// "Mad cg=0 (260)","Mad cg=0.0137 (260)","Mad cg=1 (260)",
+			// "Mad cg=0 (500)","Mad cg=0.0137 (500)","Mad cg=1 (500)"
                         };
-int maxtodo=26; 
-int todo[maxtodo]={ 1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10,
-                      11,12,13,14,15,16,17,18,19,20,
-		      21,22,23,24,25,0};
-//int todo[maxtodo]={0,6,32,31,30};
-double masses[maxtodo] = { 260,300 ,350 ,400 ,450 ,500 ,
-		      550 ,600 ,650 ,700 ,750,
-		      800 ,850 ,900 ,950 ,1000,
-                      1050,1100,1150,1200,1250,
-		      1300,1350,1400,1450,1500};
+// 4b
+int maxtodo=17; 
+int todo[maxtodo]={ 25,21,17,13,9 ,5 ,4 ,2 ,1 ,0 ,27,28,29,34,31,32,30};
+double masses[maxtodo] = { 0, 260, 300 ,350 ,400 ,450 ,500 ,550 ,600,650 ,700 ,750,800 ,850  ,950 ,1000,1100};//,
+// wwbb
+//int maxtodo=12; 
+//int todo[maxtodo]={   36,37,40,42,44,47,50,53,56,61,62,63};
+//double masses[maxtodo] = { 0, 260, 300 ,350 ,400 ,450 ,500 ,550 ,600,650 ,700 ,750};//,
 
- TLegend *leg = new TLegend(0.55,0.550,0.99,0.99);
+ TLegend *leg = new TLegend(0.65,0.550,0.99,0.99);
    leg->SetTextSize(0.03146853);
    leg->SetLineColor(1);
    leg->SetLineStyle(1);
@@ -141,7 +194,7 @@ double masses[maxtodo] = { 260,300 ,350 ,400 ,450 ,500 ,
 
  leg->SetHeader("BKG to 8TeV");
 
- int nplots =26;
+ int nplots =42;
  const char* namplots[nplots] = {
            "njets_passing_kLooseID_ct4.png",
            "H1hist.png",
@@ -164,11 +217,26 @@ double masses[maxtodo] = { 260,300 ,350 ,400 ,450 ,500 ,
            "j2histpt.png",
            "j2histeta.png",
            "RadMass_ct4vbf.png",
+           "RadPt_ct4vbf.png",
            "Deta.png",
            "fattag_ct4vbf.png",
            "btag_ct4vbf.png",
            "bmistag_ct4vbf.png",
-           "cat_ct4.png"
+           "cat_ct4.png",
+	   "gen_higgs.png",
+	   "btagselected.png",
+"E1histpt.png",  
+"E1histeta.png",  
+"E2histpt.png",  
+"E2histeta.png",  
+"LLMass_ct4.png",  
+"LL_pt_ct4.png",  
+"LL_Deta.png",  
+"MetMass_ct4.png",
+"Detabb.png",
+"DRll_test.png",
+"DRbb_test.png",
+"MetMass1_ct4.png"
     }; //25
 
 TH1D* plots[maxtodo][nplots];//[file][plot]
@@ -193,28 +261,54 @@ for(int i=0;i<maxtodo;i++){
  TH1D* plots[i][14] = (TH1D* ) file[i]->Get("btag_ct4;1"); 
  TH1D* plots[i][15] = (TH1D* ) file[i]->Get("bmistag_ct4;1"); 
  TH1D* plots[i][16] = (TH1D* ) file[i]->Get("j1histpt;1"); 
- TH1D* plots[i][17] = (TH1D* ) file[i]->Get("j1histeta;1"); 
- TH1D* plots[i][18] = (TH1D* ) file[i]->Get("j2histpt;1");//"j2histpt;1"); 
- TH1D* plots[i][19] = (TH1D* ) file[i]->Get("j1histpt;1");//"j2histeta;1"); 
+ TH1D* plots[i][17] = (TH1D* ) file[i]->Get("j2histpt;1"); 
+ TH1D* plots[i][18] = (TH1D* ) file[i]->Get("j1histeta;1");//"j2histpt;1"); 
+ TH1D* plots[i][19] = (TH1D* ) file[i]->Get("j2histeta;1");//"j2histeta;1"); 
  TH1D* plots[i][20] = (TH1D* ) file[i]->Get("RadMass_ct4vbf;1"); 
- TH1D* plots[i][21] = (TH1D* ) file[i]->Get("Deta;1"); 
- TH1D* plots[i][22] = (TH1D* ) file[i]->Get("fattag_ct4vbf;1"); 
- TH1D* plots[i][23] = (TH1D* ) file[i]->Get("btag_ct4vbf;1"); 
- TH1D* plots[i][24] = (TH1D* ) file[i]->Get("bmistag_ct4vbf;1");
- TH1D* plots[i][25] = (TH1D* ) file[i]->Get("cat_ct4;1");
+ TH1D* plots[i][21] = (TH1D* ) file[i]->Get("RadPt_ct4vbf;1"); 
+ TH1D* plots[i][22] = (TH1D* ) file[i]->Get("Deta;1"); 
+ TH1D* plots[i][23] = (TH1D* ) file[i]->Get("fattag_ct4vbf;1"); 
+ TH1D* plots[i][24] = (TH1D* ) file[i]->Get("btag_ct4vbf;1"); 
+ TH1D* plots[i][25] = (TH1D* ) file[i]->Get("bmistag_ct4vbf;1");
+ TH1D* plots[i][26] = (TH1D* ) file[i]->Get("cat_ct4;1");
+ TH1D* plots[i][27] = (TH1D* ) file[i]->Get("detahh_ct4;1");
+ TH1D* plots[i][28] = (TH1D* ) file[i]->Get("gen_higgs;1");
+ TH1D* plots[i][29] = (TH1D* ) file[i]->Get("btagselected;1");
+ TH1D* plots[i][30] = (TH1D* ) file[i]->Get("E1histpt;1");   
+ TH1D* plots[i][31] = (TH1D* ) file[i]->Get("E1histeta;1");   
+ TH1D* plots[i][32] = (TH1D* ) file[i]->Get("E2histpt;1");   
+ TH1D* plots[i][33] = (TH1D* ) file[i]->Get("E2histeta;1");   
+ TH1D* plots[i][34] = (TH1D* ) file[i]->Get("LLMass_ct4;1");   
+ TH1D* plots[i][35] = (TH1D* ) file[i]->Get("LL_pt_ct4;1");   
+ TH1D* plots[i][36] = (TH1D* ) file[i]->Get("LL_Deta;1");   
+ TH1D* plots[i][37] = (TH1D* ) file[i]->Get("MetMass_ct4;1"); //
+ TH1D* plots[i][38] = (TH1D* ) file[i]->Get("Detabb;1");//Detabb
+ TH1D* plots[i][39] = (TH1D* ) file[i]->Get("DRll_test;1");//Detabb
+ TH1D* plots[i][40] = (TH1D* ) file[i]->Get("DRbb;1");//Detabb
+ TH1D* plots[i][41] = (TH1D* ) file[i]->Get("MetMass1_ct4;1"); //
 } 
 
 const int sigcolor[nmass]={
 	2 ,1  ,5 ,6 ,7 ,
-	8 ,30  ,11,12,70,
+	9 ,30  ,11,12,70,
 	50,227,5, 6, 7,
-	8, 9, 11, 12,8,
-	2, 3, 5,  6, 5,8,
-        2, 70, 5,  6, 4,50,3};
+	227, 9, 11, 12,8,
+	2, 3, 5,  6, 5,
+        8,9,15,8, 70, 
+        5,  6, 4,50,3,
+        5 ,6 ,7 ,
+	9 ,30  ,11,12,70,
+	50,227,5, 6, 7,
+	227, 9, 11, 12,8,
+	2, 3, 5,  6, 5,
+        8,9,15,8, 70, 
+        5
+};
 
 for(int k=0;k<nplots;k++) for(int l=0;l<maxtodo;l++){
 plots[l][k]->SetLineColor(sigcolor[todo[l]]);
-plots[l][k]->SetLineStyle(0);
+//plots[l][k]->SetLineStyle(0);
+if(l>9) plots[l][k]->SetLineStyle(2); else plots[l][k]->SetLineStyle(0);
 plots[l][k]->SetLineWidth(3);
 cout<<"here "<<k<<" "<<l<<endl;
 }
@@ -223,11 +317,14 @@ TCanvas* PT_HAT = new TCanvas();
 PT_HAT->cd(); 
 int max=nmass;
 //Double_t nevents[4]={20000.,20000.,20000.,20000.};//20000.,20000.,20000.,20000.};
-double high[nplots]={1.2,1.2,1.2,1.2,1.2,
-		     1.2,1.2,1.2,1.2,40,
-		     1.2,1.2,1.2,1.2,1.2,
+double high[nplots]={1.2,0.1,4.2,2.1,1.2,
+		     0.1,4.2,1.7,10.2,8.2,
+		     3.2,1.2,1.2,1.2,1.2,
 		     1.2,1.2,1.7,1.7,1.7,
-                     1.2,1.2,1.2,1.2,1.2,2}; 
+                     10.2,4.2,4.2,1.2,1.2,
+                     1.2,1.9,10,2.5,1.7,
+                     1.7,1.7,1.7,1.7,1.7,
+		     1.7,1.5,1.2,1.7,1.7,1.7}; 
 
   for(int i=0;i<nplots;i++) {
   //if(i==16 || i==4 || i==5 || i==6 || i==7  || i==12) PT_HAT->SetLogy(1); else PT_HAT->SetLogy(0);
@@ -266,15 +363,15 @@ vector<double> nj3,nj4,nj5,nj6,nj7,nj8,nj9,nj10,njmore,ntot;
        //cout<<nbins<<endl;
        for(int k=0;k<nbins;k++) {
 	double njets = plots[j][0].GetBinContent(k); 
-        if (k == 2)      {nj3.push_back(njets); cout<<"3 jets "<<nj3[j]<<endl;}
-        else if (k == 3) {nj4.push_back(njets); cout<<"4 jets "<<nj4[j]<<endl;}
-        else if (k == 4) {nj5.push_back(njets); cout<<"5 jets "<<nj5[j]<<endl;}
-        else if (k == 5) {nj6.push_back(njets); cout<<"6 jets "<<nj6[j]<<endl;}
-        else if (k == 6) {nj7.push_back(njets); cout<<"7 jets "<<nj7[j]<<endl;}
-        else if (k == 7) {nj8.push_back(njets); cout<<"8 jets "<<nj8[j]<<endl;}
-        else if (k == 8) {nj9.push_back(njets); cout<<"9 jets "<<nj9[j]<<endl;}
-        else if (k == 9) {nj10.push_back(njets); cout<<"10 jets "<<nj10[j]<<endl;}
-        else {njmore.push_back(njets); cout<<"more "<< k<<" "<<njmore[j]<<endl;}
+        if (k == 4)      {nj3.push_back(njets); cout<<"3 jets "<<nj3[j]<<endl;}
+        else if (k == 5) {nj4.push_back(njets); cout<<"4 jets "<<nj4[j]<<endl;}
+        else if (k == 6) {nj5.push_back(njets); cout<<"5 jets "<<nj5[j]<<endl;}
+        else if (k == 7) {nj6.push_back(njets); cout<<"6 jets "<<nj6[j]<<endl;}
+        else if (k == 8) {nj7.push_back(njets); cout<<"7 jets "<<nj7[j]<<endl;}
+        else if (k == 9) {nj8.push_back(njets); cout<<"8 jets "<<nj8[j]<<endl;}
+        else if (k == 10) {nj9.push_back(njets); cout<<"9 jets "<<nj9[j]<<endl;}
+        else if (k == 11) {nj10.push_back(njets); cout<<"10 jets "<<nj10[j]<<endl;}
+        else if(k > 11){njmore.push_back(njets); cout<<"more "<< k<<" "<<njmore[j]<<endl;}
        } // close for bins
        ntot.push_back(nj3[j]+nj4[j]+nj5[j]+nj6[j]+nj7[j]+nj8[j]+nj9[j]+nj10[j]+njmore[j]);
        cout<<"total "<<ntot[j]<<endl;
@@ -386,10 +483,10 @@ vector<double> nj3,nj4,nj5,nj6,nj7,nj8,nj9,nj10,njmore,ntot;
     for(int j=0;j<maxtodo;j++) {
        cout<<lege[todo[j]]<<endl;
        // get number of njets
-       int nbins = plots[j][25].GetNbinsX();
+       int nbins = plots[j][26].GetNbinsX();
        //cout<<nbins<<endl;
        for(int k=0;k<nbins;k++) {
-	double njets = plots[j][25].GetBinContent(k); 
+	double njets = plots[j][26].GetBinContent(k); 
         if (k == 2)      {cat0.push_back(njets); cout<<"0 tag "<<cat0[j]<<endl;}
         else if (k == 3) {cat1.push_back(njets); cout<<"1 tag "<<cat1[j]<<endl;}
         else if (k == 4) {cat2.push_back(njets); cout<<"2 tag "<<cat2[j]<<endl;}
@@ -397,6 +494,7 @@ vector<double> nj3,nj4,nj5,nj6,nj7,nj8,nj9,nj10,njmore,ntot;
        ctot.push_back(cat0[j]+cat1[j]+cat2[j]);
        cout<<"total "<<ctot[j]<<endl;
    } // close for masses
+   for(int j=0;j<maxtodo;j++) cout<<lege[todo[j]]<<" "<<ctot[j]<<" "<<plots[j][26].Integral()<<endl;
    TMultiGraph *mg = new TMultiGraph();
    //
    TGraphErrors *cat0Jets = new TGraphErrors(1);

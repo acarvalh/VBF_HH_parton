@@ -10,13 +10,16 @@
 #include <iostream>
 #include <fstream>
 */
-#include <TH1F.h>
+#include <TH1D.h>
 
 //int decla();
 //int fill_hist(const vector<fastjet::PseudoJet> ,const vector<fastjet::PseudoJet> ,int);
 //int save_hist();
 
-	std::vector<TH1F *> basicvbf;
-	std::vector<TH1F *> basicHiggses;
-	TH1F *Njets_passing_kLooseID;
-        TH1F *Cat;
+	std::vector<TH1D *> basicvbf;
+	std::vector<TH1D *> basicHiggses;
+	std::vector<TH1D *> basicLeptons;
+	TH1D *Njets_passing_kLooseID;
+        TH1D *Cat;
+        TH1D *gen_higgs;
+        TH1D *btagselected;

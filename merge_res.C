@@ -144,9 +144,9 @@ const char* channel[nmass]={
 
 //const char* lege[nmass]={"300 GeV","500 GeV","600 GeV","700 GeV","800 GeV","900 GeV","1500 GeV","2500 GeV","3000 GeV"};
 
-const char* lege[nmass]={"SM HH","260 GeV","300 GeV 4b","350 GeV 4b","400 GeV 4b","450 GeV 4b","calchep 500 GeV 4b",
-                         "550 GeV 4b","600 GeV 4b","650 GeV 4b","700 GeV 4b","750 GeV 4b",
-			 "800 GeV 4b","850 GeV 4b","900 GeV 4b","950 GeV",
+const char* lege[nmass]={"SM HH","260 GeV","300 GeV","350 GeV","400 GeV","450 GeV","calchep 500 GeV",
+                         "550 GeV","600 GeV","650 GeV","700 GeV","750 GeV",
+			 "800 GeV","850 GeV","900 GeV","950 GeV",
                          "1000 GeV","1050 GeV","1100 GeV","1150 GeV",
                          "1200 GeV","1250 GeV","1300 GeV","1350 GeV",
                          "1400 GeV","1450 GeV", "1500 GeV",
@@ -169,10 +169,25 @@ const char* lege[nmass]={"SM HH","260 GeV","300 GeV 4b","350 GeV 4b","400 GeV 4b
 			// "Mad cg=0 (260)","Mad cg=0.0137 (260)","Mad cg=1 (260)",
 			// "Mad cg=0 (500)","Mad cg=0.0137 (500)","Mad cg=1 (500)"
                         };
+
 // 4b
-int maxtodo=17; 
-int todo[maxtodo]={ 25,21,17,13,9 ,5 ,4 ,2 ,1 ,0 ,27,28,29,34,31,32,30};
-double masses[maxtodo] = { 0, 260, 300 ,350 ,400 ,450 ,500 ,550 ,600,650 ,700 ,750,800 ,850  ,950 ,1000,1100};//,
+int maxtodo=13; 
+int todo[maxtodo]={ 25,21,17,13,9 ,5 ,4 ,2 ,1 ,0 ,27,28,34};
+double masses[maxtodo] = { 0, 260, 300 ,350 ,400 ,450 ,500 ,550 ,600,650 };//,
+
+/////////////////
+// 4b all
+/*
+int maxtodo=25; 
+int todo[maxtodo]={ 1, 2, 3, 4, 5,
+                    7, 8, 9, 10, 11,
+		    12,13,14,15,16,17,18,19,20,21,22,23,24,25};
+double masses[maxtodo] = { 260, 300 ,350 ,400 ,450 ,
+                           500 ,550 ,600, 650 ,700 ,
+                           750,800 ,850  ,950 ,1000,
+                          1050,1100,1150,1200,1250,
+                          1300,1350,1400,1450,1500};//,
+*/
 // wwbb
 //int maxtodo=12; 
 //int todo[maxtodo]={   36,37,40,42,44,47,50,53,56,61,62,63};
@@ -222,7 +237,8 @@ double masses[maxtodo] = { 0, 260, 300 ,350 ,400 ,450 ,500 ,550 ,600,650 ,700 ,7
            "fattag_ct4vbf.png",
            "btag_ct4vbf.png",
            "bmistag_ct4vbf.png",
-           "cat_ct4.png",
+           "cat.png",
+           "detahh.png",
 	   "gen_higgs.png",
 	   "btagselected.png",
 "E1histpt.png",  
@@ -261,8 +277,8 @@ for(int i=0;i<maxtodo;i++){
  TH1D* plots[i][14] = (TH1D* ) file[i]->Get("btag_ct4;1"); 
  TH1D* plots[i][15] = (TH1D* ) file[i]->Get("bmistag_ct4;1"); 
  TH1D* plots[i][16] = (TH1D* ) file[i]->Get("j1histpt;1"); 
- TH1D* plots[i][17] = (TH1D* ) file[i]->Get("j2histpt;1"); 
- TH1D* plots[i][18] = (TH1D* ) file[i]->Get("j1histeta;1");//"j2histpt;1"); 
+ TH1D* plots[i][17] = (TH1D* ) file[i]->Get("j1histeta;1"); 
+ TH1D* plots[i][18] = (TH1D* ) file[i]->Get("j2histpt;1");//"j2histpt;1"); 
  TH1D* plots[i][19] = (TH1D* ) file[i]->Get("j2histeta;1");//"j2histeta;1"); 
  TH1D* plots[i][20] = (TH1D* ) file[i]->Get("RadMass_ct4vbf;1"); 
  TH1D* plots[i][21] = (TH1D* ) file[i]->Get("RadPt_ct4vbf;1"); 
@@ -320,7 +336,7 @@ int max=nmass;
 double high[nplots]={1.2,0.1,4.2,2.1,1.2,
 		     0.1,4.2,1.7,10.2,8.2,
 		     3.2,1.2,1.2,1.2,1.2,
-		     1.2,1.2,1.7,1.7,1.7,
+		     1.2,5.2,1.7,1.7,1.7,
                      10.2,4.2,4.2,1.2,1.2,
                      1.2,1.9,10,2.5,1.7,
                      1.7,1.7,1.7,1.7,1.7,

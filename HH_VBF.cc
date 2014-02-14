@@ -43,9 +43,9 @@ int main() {
   ifstream in1;
   // declare the root plots to be done
   decla(0);
-  for(int i=0;i<points;i++){ // for each mass
-//  for(int i=24;i<26;i++){ // for each mass
-//  for(int i=8;i<9;i++){ // for each mass
+//  for(int i=0;i<points;i++){ // for each mass
+//  for(int i=0;i<2;i++){ // for each mass
+  for(int i=8;i<9;i++){ // for each mass
 //  for(int i=10;i<15;i++){ // for each mass
     cout<<"\n\n reading file = "<<filename.at(i)<<endl;
     in1.open(filename.at(i).c_str());

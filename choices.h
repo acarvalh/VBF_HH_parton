@@ -2,15 +2,15 @@
 // Analysis
 bool fourb=true;
 bool resonant=true;
-bool bkg = false;
+bool bkg = true;
 //
-int const nevent=20000;
+int const nevent=500000;
 // for bkg
 int const components =11;
 int comp[components] = {0,1,2,3,4,5,6,7,8,9,10}; 
 string bkgfilenames[components]={
-"zbbbbjj_unweighted_events", // 10k
-"zbbzbbjj_unweighted_events", // 10k
+"zbbbbjj_20_10k_noVBF", // 10k
+"zbbzbbjj_20_10k_noVBF", // 10k
 "dd__4bdd", // 10k
 "gg__4bddbar", // 10k
 "gg__4buubar", // 10k

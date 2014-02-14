@@ -62,13 +62,13 @@ TStyle *defaultStyle = new TStyle("defaultStyle","Default Style");
     defaultStyle->cd();
 /////////////////////////////////////////////////////
 
-int nmass = 11;
+int nmass = 23;
 //int mass[nmass]= {300,500,600,700,800,900,1500,2500,3000};
 
 const char* channel[nmass]={
-"histosnonres/Control_shower_1001.root",
 "histosnonres/Control_shower_1000.root",
 "histosnonres/Control_shower_101010.root",
+"histosnonres/Control_shower_1001.root",
 //
 "histosnonres/Control_shower_51010.root",
 "histosnonres/Control_shower_151010.root",
@@ -79,32 +79,66 @@ const char* channel[nmass]={
 "histosnonres/Control_shower_101000.root",
 "histosnonres/Control_shower_101020.root",
 "4bsbkg/Control_shower_0.root",
-"4bsbkg/Control_shower_1.root"
+"4bsbkg/Control_shower_1.root",
+"4bsbkg/Control_shower_4.root",
+"4bsbkg/Control_shower_5.root",
+"4bsbkg/Control_shower_7.root",
+// wwbb
+"nonresWWbb/Control_shower_1001.root",
+//
+"nonresWWbb/Control_shower_51010.root",
+"nonresWWbb/Control_shower_151010.root",
+//
+"nonresWWbb/Control_shower_100010.root",
+"nonresWWbb/Control_shower_102010.root",
+
+"4bsbkg/Control_shower_2.root",
+"4bsbkg/Control_shower_3.root"
 };
 const char* lege[nmass]={
-"SM",
 "SM VBFcuts",
 "CV=1 C2V=1 C3=1",
+"SM HH",
+// 3
+"CV=0.5 C2V=1 C3=1",
+"CV=1.5 C2V=1 C3=p1",
+// 5
+"CV=1 C2V=2 C3=1",
+"CV=1 C2V=0 C3=1",
+// 7
+"CV=1 C2V=1 C3=0",
+"CV=1 C2V=1 C3=2",
+// 9
+"Z(bb) bb jj",
+"Z(bb) Z(bb) jj",
+"dd > bbbb dd",
+"du > bbbb du",
+"4bjj alpgen 500k",
+//13
+// wwbb
+"SM HH",
 //
 "CV=0.5 C2V=1 C3=1",
 "CV=1.5 C2V=1 C3=p1",
-//
+// 16
 "CV=1 C2V=2 C3=1",
 "CV=1 C2V=0 C3=1",
-//
-"CV=1 C2V=1 C3=0",
-"CV=1 C2V=1 C3=2",
-"Z(bb) bb jj",
-"Z(bb) Z(bb) jj"
+// 18
+"t(Wb) t(Wb) jj",
+"WWbb jj"
+// 22
 };
 
-int maxtodo=3; 
-int todo[maxtodo]={1,9,10};
+int maxtodo=12; 
+//int maxtodo=7; 
+//int todo[maxtodo]={2,9,10};
 //int todo[maxtodo]={1,7,8};
-//int todo[maxtodo]={2,3,4,5,6,7,8};
+int todo[maxtodo]={2,3,4,5,6,7,8,9,10,11,12,13};//,7,8,9,10}; // 4b
+//int todo[maxtodo]={13,14,15,16,17,18,19};//,7,8,9,10}; //wwbb
 //double masses[maxtodo] = {0,1,2};//,650,700,750};
 //double masses[maxtodo] = {0,1,2,3,4,5,6};//,650,700,750};
-double masses[maxtodo] = {0,1,2};//,650,700,750};
+double masses[maxtodo] = {2,3,4,5,6,7,8,9,10,11,12,13};//,7,8,9,10};//,650,700,750}; // 4b
+//double masses[maxtodo] = {13,14,15,16,17,18,19};//,650,700,750};//wwbb
 
  TLegend *leg = new TLegend(0.55,0.550,0.99,0.99);
    leg->SetTextSize(0.03146853);
@@ -122,7 +156,7 @@ double masses[maxtodo] = {0,1,2};//,650,700,750};
 
  leg->SetHeader("BKG to 8TeV");
 
- int nplots =27;
+ int nplots =42;
  const char* namplots[nplots] = {
            "njets_passing_kLooseID_ct4.png",
            "H1hist.png",
@@ -145,12 +179,27 @@ double masses[maxtodo] = {0,1,2};//,650,700,750};
            "j2histpt.png",
            "j2histeta.png",
            "RadMass_ct4vbf.png",
+           "RadPt_ct4vbf.png",
            "Deta.png",
            "fattag_ct4vbf.png",
            "btag_ct4vbf.png",
            "bmistag_ct4vbf.png",
            "cat.png",
-           "detahh.png"
+           "detahh.png",
+	   "gen_higgs.png",
+	   "btagselected.png",
+"E1histpt.png",  
+"E1histeta.png",  
+"E2histpt.png",  
+"E2histeta.png",  
+"LLMass_ct4.png",  
+"LL_pt_ct4.png",  
+"LL_Deta.png",  
+"MetMass_ct4.png",
+"Detabb.png",
+"DRll_test.png",
+"DRbb_test.png",
+"MetMass1_ct4.png"
     }; //25
 
 TH1D* plots[maxtodo][nplots];//[file][plot]
@@ -176,26 +225,42 @@ for(int i=0;i<maxtodo;i++){
  TH1D* plots[i][16] = (TH1D* ) file[i]->Get("j1histpt;1"); 
  TH1D* plots[i][17] = (TH1D* ) file[i]->Get("j2histpt;1"); 
  TH1D* plots[i][18] = (TH1D* ) file[i]->Get("j1histeta;1");//"j2histpt;1"); 
- TH1D* plots[i][19] = (TH1D* ) file[i]->Get("j1histeta;1");//"j2histeta;1"); 
+ TH1D* plots[i][19] = (TH1D* ) file[i]->Get("j2histeta;1");//"j2histeta;1"); 
  TH1D* plots[i][20] = (TH1D* ) file[i]->Get("RadMass_ct4vbf;1"); 
- TH1D* plots[i][21] = (TH1D* ) file[i]->Get("Deta;1"); 
- TH1D* plots[i][22] = (TH1D* ) file[i]->Get("fattag_ct4vbf;1"); 
- TH1D* plots[i][23] = (TH1D* ) file[i]->Get("btag_ct4vbf;1"); 
- TH1D* plots[i][24] = (TH1D* ) file[i]->Get("bmistag_ct4vbf;1");
- TH1D* plots[i][25] = (TH1D* ) file[i]->Get("cat_ct4;1");
- TH1D* plots[i][26] = (TH1D* ) file[i]->Get("detahh_ct4;1");
+ TH1D* plots[i][21] = (TH1D* ) file[i]->Get("RadPt_ct4vbf;1"); 
+ TH1D* plots[i][22] = (TH1D* ) file[i]->Get("Deta;1"); 
+ TH1D* plots[i][23] = (TH1D* ) file[i]->Get("fattag_ct4vbf;1"); 
+ TH1D* plots[i][24] = (TH1D* ) file[i]->Get("btag_ct4vbf;1"); 
+ TH1D* plots[i][25] = (TH1D* ) file[i]->Get("bmistag_ct4vbf;1");
+ TH1D* plots[i][26] = (TH1D* ) file[i]->Get("cat_ct4;1");
+ TH1D* plots[i][27] = (TH1D* ) file[i]->Get("detahh_ct4;1");
+ TH1D* plots[i][28] = (TH1D* ) file[i]->Get("gen_higgs;1");
+ TH1D* plots[i][29] = (TH1D* ) file[i]->Get("btagselected;1");
+ TH1D* plots[i][30] = (TH1D* ) file[i]->Get("E1histpt;1");   
+ TH1D* plots[i][31] = (TH1D* ) file[i]->Get("E1histeta;1");   
+ TH1D* plots[i][32] = (TH1D* ) file[i]->Get("E2histpt;1");   
+ TH1D* plots[i][33] = (TH1D* ) file[i]->Get("E2histeta;1");   
+ TH1D* plots[i][34] = (TH1D* ) file[i]->Get("LLMass_ct4;1");   
+ TH1D* plots[i][35] = (TH1D* ) file[i]->Get("LL_pt_ct4;1");   
+ TH1D* plots[i][36] = (TH1D* ) file[i]->Get("LL_Deta;1");   
+ TH1D* plots[i][37] = (TH1D* ) file[i]->Get("MetMass_ct4;1"); //
+ TH1D* plots[i][38] = (TH1D* ) file[i]->Get("Detabb;1");//Detabb
+ TH1D* plots[i][39] = (TH1D* ) file[i]->Get("DRll_test;1");//Detabb
+ TH1D* plots[i][40] = (TH1D* ) file[i]->Get("DRbb;1");//Detabb
+ TH1D* plots[i][41] = (TH1D* ) file[i]->Get("MetMass1_ct4;1"); //
 } 
 
 const int sigcolor[nmass]={
-	2,3,5,6,7,
-	8,9,11,12,50,227};//,
-	//50,227};//,5,6,7,
-	//8,9,11,12,
-	//2,3,5,6,5,8};
+	2,  3, 5, 6, 7,
+	8,  9, 11,12,50,
+	227,55,1, 5, 6,
+	7,  8, 9,11,12,
+	2,  3};//, 5, 6, 5,8};
 
 for(int k=0;k<nplots;k++) for(int l=0;l<maxtodo;l++){
 plots[l][k]->SetLineColor(sigcolor[todo[l]]);
-plots[l][k]->SetLineStyle(0);
+if(l==12 || l==11 || l==10 || l==9 || l==8 || l==7 ) plots[l][k]->SetLineStyle(2); else plots[l][k]->SetLineStyle(0);
+//if(l==5 || l==6 ) plots[l][k]->SetLineStyle(2); else plots[l][k]->SetLineStyle(0);
 plots[l][k]->SetLineWidth(3);
 cout<<"here "<<k<<" "<<l<<endl;
 }
@@ -205,10 +270,13 @@ PT_HAT->cd();
 int max=nmass;
 //Double_t nevents[4]={20000.,20000.,20000.,20000.};//20000.,20000.,20000.,20000.};
 double high[nplots]={1.2,1.2,4.2,2.1,1.2,
-		     1.2,4.2,1.7,1.2,1.2,
-		     1.2,1.2,1.2,1.2,1.2,
+		     1.2,4.2,1.7,10.2,8.2,
+		     3.2,1.2,1.2,1.2,1.2,
 		     1.2,1.2,1.7,1.7,1.7,
-                     1.2,1.2,1.2,1.2,1.2,1.2,1.9}; 
+                     10.2,4.2,4.2,1.2,1.2,
+                     1.2,1.9,10,2.5,1.7,
+                     1.7,1.7,1.7,1.7,1.7,
+		     1.7,1.5,1.2,1.7,1.7,1.7}; 
 
   for(int i=0;i<nplots;i++) {
   //if(i==16 || i==4 || i==5 || i==6 || i==7  || i==12) PT_HAT->SetLogy(1); else PT_HAT->SetLogy(0);
@@ -377,6 +445,7 @@ vector<double> nj0,nj1,nj2,nj3,nj4,nj5,nj6,nj7,nj8,nj9,nj10,njmore,ntot;
    } // close for masses
    cout<<"sample"<<" "<<"ctot"<<endl;
    for(int j=0;j<maxtodo;j++) cout<<lege[todo[j]]<<" "<<ctot[j]<<endl;
+   //
    TMultiGraph *mg = new TMultiGraph();
    //
    TGraphErrors *cat0Jets = new TGraphErrors(1);

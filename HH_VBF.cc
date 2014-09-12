@@ -1,6 +1,7 @@
 //////////////////
 // to run:
 // make HH_VBF
+// ./HH_VBF
 /////////////////
 #include "fastjet/ClusterSequence.hh"
 #include "fastjet/Selector.hh"
@@ -10,9 +11,7 @@ using namespace fastjet;
 using namespace std;
 #include "Functions.h"
 #include "choices.h"
-
 int main() {
-
   srand( time(NULL) );
   hello();
   // input
@@ -21,14 +20,14 @@ int main() {
   int points;
   if(resonant && !bkg) {
       //path="bulk_graviton/RSG_WBF_hh-Mhh"; points = masses;
-      if(fourb) path="bulk_graviton_mad/MGraviton_"; points = masses;
+      if(fourb) path="spin0/Mh2_bulk_"; points = masses;
       if(!fourb) path="bulk_graviton_mad_WWbb/MGraviton_"; points = masses;       
   }
   else if (!bkg && fourb) {path="nonresonant/pp_hh_vbf_"; points = parameters;}//nonresWWbb
   else if (!bkg && !fourb) {path="nonresWWbb/pp_hh_vbf_"; points = parameters;}//
   else {path="4bsbkg/"; points = components;}
-  data = ".lhe.decayed";
-  
+  data = ".lhe.decayed.shower";
+  //  
   for(int i=0;i<points;i++){
     if(resonant && !bkg) {
       ostringstream o;
@@ -43,14 +42,14 @@ int main() {
   ifstream in1;
   // declare the root plots to be done
   decla(0);
-//  for(int i=0;i<points;i++){ // for each mass
-//  for(int i=0;i<2;i++){ // for each mass
-  for(int i=8;i<9;i++){ // for each mass
-//  for(int i=10;i<15;i++){ // for each mass
+  for(int i=0;i<1;i++){ // for each mass
+  //  for(int i=0;i<2;i++){ // for each mass
+  //  for(int i=8;i<9;i++){ // for each mass
+  //  for(int i=11;i<15;i++){ // for each mass
     cout<<"\n\n reading file = "<<filename.at(i)<<endl;
     in1.open(filename.at(i).c_str());
     for(int ievent=0;ievent<nevent;ievent++){ // for each event  // 
-//    for(int ievent=0;ievent<20;ievent++){ // for each event  // 
+    //for(int ievent=0;ievent<20;ievent++){ // for each event  // 
         //cout<<"----------------------------------------------------"<<endl;
         string c;
         in1>>c;
@@ -64,7 +63,8 @@ int main() {
         vector<PseudoJet> higgses;                    
         int nb = 0;
         int nvbf = 0;
-        in1>>nparticles;  int counter=0,counterh=0,counterl=0,countern=0; 
+        in1>>nparticles;  int counter=0,counterh=0,counterl=0,countern=0;
+   cout<<nparticles<<endl; 
         for(int ipart=0;ipart<nparticles;ipart++){ // loop on particles
           in1 >> pID >> Px >> Py >> Pz >> E ;//>> idup;
           //cout<< pID <<endl;   
@@ -72,7 +72,6 @@ int main() {
 		particles.push_back(fastjet::PseudoJet(Px,Py,Pz,E)); 
                 particles.at(counter).set_user_index(pID); 
 		if(abs(pID) == 5) nb++; else nvbf++; // count b's and no-b's
-		
                 //cout<<"particle flavour "<< particles.at(counter).user_index()<<endl;
 		counter++;
 	  } else if (pID==25) {
@@ -100,15 +99,17 @@ int main() {
         //istagged(jets, fattag); // check wheather the jet is fat -- by now only invariant mass
 	// VBF combinatorics and cuts
 	vector<int> vbftag; // keeps the entries of jets that are the VBF, have two entries
-	bool VBF = findVBF(jets, fattag, btag, bmistag, vbftag);
+	bool VBF =  findVBF(jets, fattag, btag, bmistag, vbftag);
+        //cout<<"number of b particles = "<< nb<<" number of leptons = "<< counterl<<" number of neutrinos = "<< countern<<" number of jets = "<< nvbf<<" event "<< ievent<<endl;
 	if (VBF){ // pass VBF
-	  //vector<int> H1;
-	  //vector<int> H2;
-	  bool reco=false;
-	  if(fourb) {reco = analyse_4b(jets,fattag,btag,bmistag,vbftag,mass[i]);}
-          else if (counterl>1 && countern>1) reco = analyse_2b2w(jets,fattag,btag,bmistag,vbftag,leptons,neutrinos);
+	  bool reco=false; 
+	  if(fourb) {reco = analyse_4b(jets,fattag,btag,bmistag,vbftag,mass[i]); } //cout<<"here 3"<<endl;  
+          else if (counterl>1 && countern>1) reco = analyse_2b2w(jets,fattag,btag,bmistag,vbftag,leptons,neutrinos); else cout<<"number of b particles = "<< nb<<" number of leptons = "<< counterl<<" number of neutrinos = "<< countern<<" number of jets = "<< nvbf<<" event "<< ievent<<endl;   
         } // close pass VBF
-        //else cout<<"vbf loose"<<endl;
+        //
+    jets.clear();
+    fattag.clear();
+    btag.clear();
     } // close for event
     if(resonant && !bkg) save_hist(mass[i],resonant,bkg,fourb); 
     else if(!bkg) save_hist(parameter[i],resonant,bkg,fourb);

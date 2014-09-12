@@ -66,23 +66,23 @@ int nmass = 23;
 //int mass[nmass]= {300,500,600,700,800,900,1500,2500,3000};
 
 const char* channel[nmass]={
-"histosnonres/Control_shower_1000.root",
-"histosnonres/Control_shower_101010.root",
-"histosnonres/Control_shower_1001.root",
+"nonresonant/Control_shower_1000.root",
+"nonresonant/Control_shower_101010.root",
+"nonresonant/Control_shower_1001.root",
 //
-"histosnonres/Control_shower_51010.root",
-"histosnonres/Control_shower_151010.root",
+"nonresonant/Control_shower_51010.root",
+"nonresonant/Control_shower_151010.root",
 //
-"histosnonres/Control_shower_100010.root",
-"histosnonres/Control_shower_102010.root",
+"nonresonant/Control_shower_100010.root",
+"nonresonant/Control_shower_102010.root",
 //
-"histosnonres/Control_shower_101000.root",
-"histosnonres/Control_shower_101020.root",
+"nonresonant/Control_shower_101000.root",
+"nonresonant/Control_shower_101020.root",
 "4bsbkg/Control_shower_0.root",
 "4bsbkg/Control_shower_1.root",
 "4bsbkg/Control_shower_4.root",
 "4bsbkg/Control_shower_5.root",
-"4bsbkg/Control_shower_7.root",
+"4bsbkg/Control_shower_8.root",
 // wwbb
 "nonresWWbb/Control_shower_1001.root",
 //
@@ -269,14 +269,14 @@ TCanvas* PT_HAT = new TCanvas();
 PT_HAT->cd(); 
 int max=nmass;
 //Double_t nevents[4]={20000.,20000.,20000.,20000.};//20000.,20000.,20000.,20000.};
-double high[nplots]={1.2,1.2,4.2,2.1,1.2,
-		     1.2,4.2,1.7,10.2,8.2,
-		     3.2,1.2,1.2,1.2,1.2,
-		     1.2,1.2,1.7,1.7,1.7,
-                     10.2,4.2,4.2,1.2,1.2,
-                     1.2,1.9,10,2.5,1.7,
-                     1.7,1.7,1.7,1.7,1.7,
-		     1.7,1.5,1.2,1.7,1.7,1.7}; 
+double high[nplots]={10.2,10.2,40.2,20.1,10.2,
+		     10.2,40.2,10.7,10.2,80.2,
+		     30.2,10.2,10.2,10.2,10.2,
+		     10.2,10.2,10.7,10.7,10.7,
+                     10.2,40.2,40.2,10.2,10.2,
+                     10.2,10.9,10,20.5,10.7,
+                     10.7,10.7,10.7,10.7,10.7,
+		     10.7,10.5,10.2,10.7,10.7,10.7}; 
 
   for(int i=0;i<nplots;i++) {
   //if(i==16 || i==4 || i==5 || i==6 || i==7  || i==12) PT_HAT->SetLogy(1); else PT_HAT->SetLogy(0);
@@ -289,7 +289,7 @@ double high[nplots]={1.2,1.2,4.2,2.1,1.2,
 	for(int j=1;j<maxtodo;j++) {
 	//if(i==1) cout<<"higgs mass "<<plots[j][i].Integral() <<endl;
         //	plots[j][i].Scale(nevents[j]);
-		//plots[j][i].Scale(plots[j][i].Integral());
+		if(i!=26)plots[j][i].Scale(1./plots[j][i].Integral());
 		plots[j][i].Draw("Hist,same");
 	
 	}
@@ -432,10 +432,10 @@ vector<double> nj0,nj1,nj2,nj3,nj4,nj5,nj6,nj7,nj8,nj9,nj10,njmore,ntot;
     for(int j=0;j<maxtodo;j++) {
        cout<<lege[todo[j]]<<endl;
        // get number of njets
-       int nbins = plots[j][25].GetNbinsX();
+       int nbins = plots[j][26].GetNbinsX();
        //cout<<nbins<<endl;
        for(int k=0;k<nbins;k++) {
-	double njets = plots[j][25].GetBinContent(k); 
+	double njets = plots[j][26].GetBinContent(k); 
         if (k == 2)      {cat0.push_back(njets); cout<<"0 tag "<<cat0[j]<<endl;}
         else if (k == 3) {cat1.push_back(njets); cout<<"1 tag "<<cat1[j]<<endl;}
         else if (k == 4) {cat2.push_back(njets); cout<<"2 tag "<<cat2[j]<<endl;}

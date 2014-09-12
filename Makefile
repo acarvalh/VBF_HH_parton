@@ -28,28 +28,27 @@ MODULES = Functions #
 
 MDIR = ./
 
-# root
-ROOTINCS = $(shell /home/xanda/root/bin/root-config --cflags) 
-ROOTLIBS = $(shell /home/xanda/root/bin/root-config --glibs) 
-
 #LHAPDF
 #LHAPDFINCS = -I$(shell lhapdf-config --prefix)/include
 #LHAPDFDIR  = $(shell lhapdf-config --prefix)/lib
 #LHAPDFLIBS = -L$(LHAPDFDIR) -lLHAPDF
 
 # fastjet
-FJINCS = $(shell /home/xanda/Documents/fastjet-install/bin/fastjet-config --cxxflags)
-FJCLIBS    = $(shell /home/xanda/Documents/fastjet-install/bin/fastjet-config --libs)
+FJINCS = $(shell /home/xanda/Documents/fastjet-install-310/bin/fastjet-config --cxxflags)
+FJCLIBS    = $(shell /home/xanda/Documents/fastjet-install-310/bin/fastjet-config --libs)
+
+# root
+ROOTINCS = $(shell /home/xanda/root/bin/root-config --cflags) 
+ROOTLIBS = $(shell /home/xanda/root/bin/root-config --glibs) 
+
+# scheduling and optimization options (such as -DSSE -DSSE2 -DP4) 
+CFLAGS = -ansi -O3 -Wall  
 
 # additional include directories
-INCPATH = -I../include $(LHAPDFINCS) $(FJINCS) $(ROOTINCS)
+INCPATH = -I../include $(FJINCS)  $(ROOTINCS)
 
 # additional libraries to be included 
-LIBS = $(LHAPDFLIBS) $(FJCLIBS)   $(ROOTLIBS)
-
-# scheduling and optimization options (such as -DSSE -DSSE2 -DP4)
- 
-CFLAGS = -Wall -ansi -O3 
+LIBS =  $(FJCLIBS)   $(ROOTLIBS)
 
 ############################## do not change ###################################
 

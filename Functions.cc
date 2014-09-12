@@ -3,6 +3,9 @@
 #include "fastjet/tools/Filter.hh"
 #include "fastjet/Selector.hh"
 #include "fastjet/tools/MassDropTagger.hh"
+#include "fastjet/contrib/Nsubjettiness.hh"
+#include "fastjet/contrib/Njettiness.hh"
+#include "fastjet/contrib/NjettinessPlugin.hh"
 #include "deltaphi.h"
 #include <TCanvas.h>
 #include <TFile.h>
@@ -22,7 +25,9 @@
 #include "cuts.h" // basic cuts 
 using namespace fastjet;
 using namespace std;
-
+using namespace fastjet::contrib;
+bool findVBFsimple(vector<PseudoJet> jets, vector<int> & vbftag, vector<int> & listNonTag);
+/////////////////////////////////////////////////////////////////
 void hello(){cout<<"\n\n\n HELLO!!!! \n\n"<<endl;}
 /////////////////////////////////////////////////////////////////
 void genhiggs(int counterh, vector<PseudoJet> higgses){
@@ -34,8 +39,9 @@ bool analyse_2b2w(
 	vector<PseudoJet> jets, vector<int> fattag, vector<int> btag, vector<int> bmistag,vector<int> vbftag,
 	vector<PseudoJet> leptons, vector<PseudoJet> neutrinos){
   PseudoJet H1,H2; 
-  float Hmin = higgs_mass*(1-tolerance);
-  float Hmax = higgs_mass*(1+tolerance);
+  int nfat=0, nbtag=0, nmistag=0;
+  float Hmin = higgs_mass*(1-toleranceH1);
+  float Hmax = higgs_mass*(1+toleranceH1);
   bool found = false;
   PseudoJet Xres;
   int cate;
@@ -52,21 +58,19 @@ bool analyse_2b2w(
   int MinDRLep = TMath::LocMin(LepIso.size(), &LepIso[0]);
   //if(MinDRLep<0) for(int i = 0;i<LepIso.size();i++)
   //cout <<LepIso[MinDRLep]<< endl;   
-  double MET=(neutrinos.at(0)+neutrinos.at(1)).m();
+  double MTnunu=(neutrinos.at(0)+neutrinos.at(1)).mperp();
   if(1>0
    && LepIso[MinDRLep] > lepiso  
    && leptons.at(0).pt()> ptlepton 
    && leptons.at(1).pt()> ptlepton
    && leptons.at(0).eta()< etab 
    && leptons.at(1).eta()< etab
-   && MET> 0
+   && MTnunu > 0
    //
    ){     
     H1 = leptons.at(0)+leptons.at(1)+neutrinos.at(0)+neutrinos.at(1);
     // deal with the jets -- separate analysis by number of fattags
-    int nfat=0, nbtag=0, nmistag=0;
-    for(int i=0;i<jets.size();i++) // count
-	{ nbtag = nbtag + btag[i]; nmistag = nmistag + bmistag[i];} 
+    for(int i=0;i<jets.size();i++) { nbtag = nbtag + btag[i]; nmistag = nmistag + bmistag[i];} 
     if(jets.size() > 2 && fattag.size() >0) {
        H2=jets.at(fattag[0]); 
        // quality requirements   
@@ -75,63 +79,54 @@ bool analyse_2b2w(
        Xres = H1 +H2;
        // cout << " category "<<"1"<<" mass "<<Xres.m()<<" btags "<<nbtag <<endl; 
        if( 
-//         massDiff < tolerance && //rapDiff < deltaEtaHH &&
-//         (H1.m() > Hmin && H1.m() < Hmax) &&
          (H2.m() > Hmin && H2.m() < Hmax)
          && (H1+H2).m() >MHH
-         //&& rapDiff<DetaHH
-	 && MET < MnunuMax
+	 && MTnunu < MnunuMax
 	 && (leptons.at(0)+leptons.at(1)).m() < MeeMax
          //&& abs(jets.at(jetn1[minM]).eta()+jets.at(jetn2[minM]).eta())<DetaH
-         ){ found=true; cate =1;
-           //if(Xres.m()<250) 
-           
-         } // close quality 
+         ){ found=true; cate =1;         } // close quality 
+           //cout << " category "<<cate<<" mass "<<Xres.m()<<" btags "<<nbtag <<endl;
     } // close 1 tag
     if(jets.size() > 3 && !found){
-      // find the Hbb candidate
       // pair H2 the jets by the minimum invariant mass difference with H1
       std::vector<double> a1; 
       double invmassB = H1.m(); 
       for(int nj1=0; nj1< jets.size(); nj1++)  if(nj1 != vbftag[0] && nj1 != vbftag[1]) 
          for(int nj2=nj1+1; nj2< jets.size(); nj2++) if(nj2 != vbftag[0] && nj2 != vbftag[1]) { 
-	   //std::cout<<nj1<<nj2<<" "<<nj3<<nj4<<std::endl;
 	   double invmassA =  (jets.at(nj1)+jets.at(nj2)).m();
 	   a1.push_back((invmassA-invmassB)*(invmassA-invmassB)); 
 	   jetn1.push_back(nj1);jetn2.push_back(nj2); // we also what to keep the nj...           
        } // loop on jets
        //Find the minumum value of the vector (iterator version)
        minM = TMath::LocMin(a1.size(), &a1[0]);
-       //std::cout<<"hi, the jets pairs are !!!! "<<jetn1[minM]<<jetn2[minM]<<" "
-	  //<<fattag[0]<<std::endl;
        H2=jets.at(jetn1[minM])+jets.at(jetn2[minM]);
        Xres = H2+leptons.at(0)+leptons.at(1)+neutrinos.at(0)+neutrinos.at(1); 
-       // quality requirements   
-       //double massDiff = abs(2*(H1.m() - H2.m())/(H1.m() + H2.m()));
-       //double rapDiff = abs(H1.eta() - H2.eta());
        if( 
-         //massDiff < tolerance && //rapDiff < deltaEtaHH &&
-         //(H1.m() > Hmin && H1.m() < Hmax) &&
          (H2.m() > Hmin && H2.m() < Hmax)
          && (H1+H2).m() >MHH
-         && MET < MnunuMax
+         && MTnunu < MnunuMax
 	 && (leptons.at(0)+leptons.at(1)).m() < MeeMax 
          //&& rapDiff<DetaHH
          && abs(jets.at(jetn1[minM]).eta()+jets.at(jetn2[minM]).eta())<DetaH
-         ){ found=true; cate=1; //Cat->Fill(0.,weight);
+         ){ found=true; cate=0;//Cat->Fill(0.,weight);
            //if(Xres.m()<250) 
           //cout << " category "<<"0"<<" mass "<<Xres.m()<<" btags "<<nbtag <<endl;
-       } // close quality 
-    } 
-    else return found; // close if 2 tags// close if 0 tag
+          } // close quality 
+     } // close if 2 tags
+    } else return found; // not found 2 leptons
   //////////////////////////////////////
-  if(found){
+  if(found==true){
        ///////////////////////////
        // fill the histos
        ///////////////////////////
        //cout<<"fat tag = " <<nfat <<" number of plots "<<basicHiggses.size()<<endl;
        const int numvar1=16;
-       if(nbtag >cat){
+      if( 1>0 
+         && (nbtag >cat && cate==0 ) ||
+         ( nbtag >cat-1 && cate==1 ) 
+         ){
+         //cout << " category "<<"0"<<" mass "<<Xres.m()<<" btags "<<nbtag <<endl;
+         Cat->Fill(cate,weight);
          double monovar[numvar1] = {
           H1.m(),H1.pt(),H1.eta(),H1.phi(), //4
           H2.m(),H2.pt(),H2.eta(),H2.phi(), // 4
@@ -159,48 +154,64 @@ bool analyse_2b2w(
          //basicLeptons
          const int numvar3=12;
          double detalep; detalep = abs((leptons.at(0).eta() - leptons.at(1).eta()));
-         double drlep; drlep = LepIso[0];//jets.at(jetn1[minM]).delta_R(jets.at(jetn2[minM]));
-	 //cout<<" "<<basicLeptons.size()<<" "<<drlep<<" "<<detalep<<" "<<(leptons.at(0)+leptons.at(1)).pt()<<endl;
+         double drlep=-1; drlep = LepIso[0];
          double detabb =-1 ,drbb=-1; 
-         if (jets.at(jetn2[minM]).m()>0) {
+         if(cate ==0)if (jets.at(jetn2[minM]).m()>0 ) {
             drbb=jets.at(jetn1[minM]).delta_R(jets.at(jetn2[minM]));//
             detabb=abs(jets.at(jetn1[minM]).eta()-jets.at(jetn2[minM]).eta());
          }
-         //cout<<"plots vbf "<<basicvbf.size()<<endl;
+         cout<<"plots vbf "<<basicLeptons.size()<<" "<<MTnunu<<endl;
+         //double met = MET;
          double monovarlep[numvar3] = {
           leptons.at(0).pt(),leptons.at(0).eta(), //2
           leptons.at(1).pt(),leptons.at(1).eta(), //2
           (leptons.at(0)+leptons.at(1)).m(),(leptons.at(0)+leptons.at(1)).pt(),detalep , // 2
-	  (H2+leptons.at(0)+leptons.at(1)).m(),
-          detabb,drlep,drbb,MET
+	  (H2+leptons.at(0)+leptons.at(1)).m(), detabb,drlep,MTnunu
          }; //25
          for (int j=0; j<basicLeptons.size(); j++) basicLeptons[j]->Fill(monovarlep[j],weight); // weight
-         Cat->Fill(cate,weight);
        } // close if correct btag
      btagselected->Fill(nbtag,weight); 
   }  // close if fill 
      // histos -- met and Mee Ptee 
-  } // close if the leptons pass the cuts
+  //} // close if the leptons pass the cuts
 return found; // close if 2 tags
 }//close WWbb
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
 bool analyse_4b(
-	vector<PseudoJet> jets, vector<int> fattag, vector<int> btag, vector<int> bmistag,vector<int> vbftag, int Xmass){
+	vector<PseudoJet> jets, vector<int> fattag, vector<int> btag, vector<int> bmistag,
+        vector<int> vbftag, int Xmass){
   // pair the jets that was not VBF tagged
-  bool found = false;
+  bool found = false; 
   PseudoJet Xres;
   // now we separate analysis
   // number of fattags
   int nfat=0, nbtag=0, nmistag=0;
   double massDiff; 
   int minM,minM2,cate=-2;
-  for(int i=0;i<jets.size();i++) { nbtag = nbtag + btag[i]; nmistag = nmistag + bmistag[i];}
+  // do a vector with btagged jets and fat btagged jets
+  vector<int> bjets, fatbjets, misbjets, misfatbjets, listNonTag; // list non fat b jets
+  vector<double> bweights; double final_weight;
+  for(int i=0;i<jets.size();i++) { 
+    nbtag = nbtag + btag[i]; nmistag = nmistag + bmistag[i];
+    if(btag[i]>0) { // think on mistag later
+      int teste=0;
+      for(int j=0;j<fattag.size();j++) if(fattag[j]==i) {
+         fatbjets.push_back(i);teste=1;
+         if(btag[i]==2) bweights.push_back(subjet2b); // calculate distances to decide
+         if(btag[i]==1) bweights.push_back(fatjet2b); 
+      }  
+      if(teste==0) {bjets.push_back(i); bweights.push_back(normalb);}
+    } else {listNonTag.push_back(i); bweights.push_back(1);}
+  } 
+  // change the analysis to take only b--tagged 
   nfat = fattag.size();// nfat + fattag[i];
   PseudoJet H1,H2;
-  float Hmin = higgs_mass*(1-tolerance);
-  float Hmax = higgs_mass*(1+tolerance);
+  float Hmin1 = higgs_mass*(1-toleranceH2);
+  float Hmax1 = higgs_mass*(1+toleranceH1);
+  float Hmin2 = higgs_mass*(1-toleranceH2);
+  float Hmax2 = higgs_mass*(1+toleranceH2);
   double drbb =-1, drbb2 =-1;
   std::vector<double> a1,a2; 
   std::vector< int > jetn1, jetn2,jetn3, jetn4; // to keep the pairs resolved
@@ -214,17 +225,19 @@ bool analyse_4b(
     massDiff = abs(2*(H1.m() - H2.m())/(H1.m() + H2.m()));
     double rapDiff = abs(H1.eta() - H2.eta());
     Xres = H1 +H2; 
-    if( //massDiff1 < tolerance 
-       //&& massDiff2 < tolerance //rapDiff < deltaEtaHH &&
-       H1.m() > Hmin && H1.m() < Hmax
-       && H2.m() > Hmin && H2.m() < Hmax
+    if(1>0
+       && H1.m() > minMH && H2.m() > minMH 
+       && H1.m() > Hmin1 && H1.m() < Hmax1 
+       && H2.m() > Hmin2 && H2.m() < Hmax2
        && H1.pt() > H1_ptmin && H2.pt() > H2_ptmin  
+       && Xres.pt() > HH_ptmin 
        && (H1+H2).m() >MHH
        && Xres.m() < Xmass*(1.+toleranceX)
        && Xres.m() > Xmass*(1.-toleranceX) 
-       //&& rapDiff<DetaHH
+       && rapDiff<DetaHH
       ){  found=true;
 	cate=2; 
+        final_weight = bweights[fattag[0]]*bweights[fattag[0]];
         //cout << " category "<<cate<<" mass "<<Xres.m()<<endl;
         //if(Xres.m()<250) cout << " category "<<2<<" mass "<<Xres.m()<<" btags "<<nbtag <<endl;
       }   
@@ -235,7 +248,7 @@ bool analyse_4b(
    //int nj; for(nj=0; nj< jets.size(); nj++) if(fattag[nj]==1) {
    H1=jets.at(fattag[0]);//}
    // pair H2 the jets by the minimum invariant mass difference with H1
-   double invmassB =  H1.m();
+   double invmassB = H1.m();
    for(int nj1=0; nj1< jets.size(); nj1++)  if(nj1 != vbftag[0] && nj1 != vbftag[1] && nj1!=fattag[0]) 
      for(int nj2=nj1+1; nj2< jets.size(); nj2++) if(nj2 != vbftag[0] && nj2 != vbftag[1] && nj2!=fattag[0]) { 
 	   //std::cout<<nj1<<nj2<<" "<<nj3<<nj4<<std::endl;
@@ -254,23 +267,26 @@ bool analyse_4b(
     Xres = H1 +H2; 
     double rapDiff = abs(H1.eta() - H2.eta());
     if( //massDiff < tolerance && //rapDiff < deltaEtaHH &&
-       H1.m() > Hmin && H1.m() < Hmax &&
-       H2.m() > Hmin && H2.m() < Hmax
+       1>0
+       && H1.m() > minMH && H2.m() > minMH 
+       && H1.m() > Hmin1 && H1.m() < Hmax1 
+       && H2.m() > Hmin2 && H2.m() < Hmax2
        && H1.pt() > H1_ptmin && H2.pt() > H2_ptmin  
        && (H1+H2).m() >MHH
+       && Xres.pt() > HH_ptmin 
        && Xres.m()< Xmass*(1+toleranceX)
        && Xres.m()> Xmass*(1-toleranceX) 
-       //&& rapDiff<DetaHH
+       && rapDiff<DetaHH
        //&& abs(jets.at(jetn1[minM]).eta()+jets.at(jetn2[minM]).eta())<DetaH
       ){ found=true; 
         //if(Xres.m()<250)
 	cate=1; 
-        //cout << " category "<<cate<<" mass "<<Xres.m()<<endl;
+        final_weight = bweights[fattag[0]]*bweights[jetn11[minM]]*bweights[jetn21[minM]];
       } // close quality
   } // close if 1 tag
   else if(jets.size() > 5 && found==false) { // resolved
    // pair the jets by the minimum invariant mass difference
-   //std::cout<<"resolved! "<<std::endl;
+  // std::cout<<"resolved! "<<std::endl;
    for(int nj1=0; nj1< jets.size(); nj1++)   
      for(int nj2=0; nj2< jets.size(); nj2++) 
        for(int nj3=0; nj3< jets.size(); nj3++)     
@@ -304,21 +320,27 @@ bool analyse_4b(
     Xres = H1 +H2;
     if( 
        //massDiff < tolerance && //rapDiff < deltaEtaHH &&
-       H1.m() > Hmin && H1.m() < Hmax 
-       && H2.m() > Hmin && H2.m() < Hmax
+       1>0
+       && H1.m() > minMH && H2.m() > minMH 
+       && H1.m() > Hmin1 && H1.m() < Hmax1 
+       && H2.m() > Hmin2 && H2.m() < Hmax2
        && H1.pt() > H1_ptmin && H2.pt() > H2_ptmin         
        && (H1+H2).m() >MHH
+       && Xres.pt() > HH_ptmin 
        && Xres.m()< Xmass*(1.+toleranceX)
        && Xres.m()> Xmass*(1.-toleranceX) 
+       && rapDiff<DetaHH
+       //&&        H2.m() > 15
       ){ //std::cout<<"getting there"<<std::endl; 
 	found=true;
 	cate=0;  
+        final_weight = bweights[jetn1[minM]]*bweights[jetn2[minM]]*bweights[jetn3[minM]]*bweights[jetn4[minM]];
       } // close quality
   } 
   //////////////////////////////////////
   //if(massDiff > 0.1 && nbtag>3) cout << "failed , btags = "<<H1.m()<<" "<<H2.m()<<" "<<cate<<endl;
   //cout << "Mass hyp = "<<Xmass<<endl;
-  if(found ){
+  if(found ){ 
        ///////////////////////////
        // fill the histos
        ///////////////////////////
@@ -329,8 +351,238 @@ bool analyse_4b(
          (nbtag >cat-1 && cate==1 ) ||
          (nbtag >cat-2 && cate==2 )
          ){
+        //if(H1.m()>130) cout << " category "<<cate<<" mass "<<Xres.m()<<" nbtag "<<nbtag<<endl;
          Cat->Fill(cate,weight);
          // cout << " category "<<cate<<" mass "<<Xres.m()<<endl;
+         double monovar[numvar1] = {
+          H1.m(),H1.pt(),H1.eta(),H1.phi(), //4
+          H2.m(),H2.pt(),H2.eta(),H2.phi(), // 4
+          Xres.m(),Xres.pt(),Xres.eta(),Xres.phi(), // 4
+	  nfat,nbtag,nmistag,abs(H1.eta() - H2.eta())
+         }; //25
+         for (int j=0; j<basicHiggses.size(); j++) basicHiggses[j]->Fill(monovar[j],final_weight); // weight
+         ///////////////////////////
+         // fill the jet histos
+         ///////////////////////////
+         const int numvar2=10; 
+         PseudoJet vbfmass = jets.at(vbftag[0]) +jets.at(vbftag[1]); 
+         double Deta = abs(jets.at(vbftag[0]).eta() -jets.at(vbftag[1]).eta());
+         //cout<<"plots vbf "<<basicvbf.size()<<endl;
+         double monovarvbf[numvar2] = {
+          jets.at(vbftag[0]).pt(),jets.at(vbftag[0]).eta(), //2
+          jets.at(vbftag[1]).pt(),jets.at(vbftag[1]).eta(), //2
+          vbfmass.m(),vbfmass.pt(),Deta, // 2
+	  nfat,nbtag,nmistag
+         }; //25
+         for (int j=0; j<basicvbf.size(); j++) basicvbf[j]->Fill(monovarvbf[j],final_weight); // weight
+        /////////////////////////////////
+         // fill leptons histos with 0
+         ////////////////////////////////
+         //basicLeptons
+         const int numvar3=12;
+         /* if(minM2 >0) { 
+            drbb=jets.at(jetn1[minM2]).delta_R(jets.at(jetn2[minM2]));//
+            drbb2=jets.at(jetn3[minM2]).delta_R(jets.at(jetn4[minM2]));
+         } else if(minM >0) {drbb=jets.at(jetn11[minM]).delta_R(jets.at(jetn21[minM])); drbb2=0;} cout <<"here2"<< endl; */
+         double monovarlep[numvar3] = {0,0,0,0,0,0,0,0,0,drbb,drbb2,0}; //25
+         for (int j=0; j<basicLeptons.size(); j++) basicLeptons[j]->Fill(monovarlep[j],weight); // weight
+       } // close if correct btag
+     btagselected->Fill(nbtag,weight); 
+  }  // close if fill 
+  //else cout << " category "<<nfat<<" mass "<<Xres.m()<<" btags "<<nbtag <<endl;
+return found; // close if 2 tags
+} // close 4b analysis
+/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
+bool analyse_4b_prior(
+	vector<PseudoJet> jets, vector<int> fattag, vector<int> btag, vector<int> bmistag,
+        vector<int> vbftag, int Xmass){
+  // pair the jets using btag
+  bool found = false, foundvbf =false; 
+  PseudoJet Xres;
+  // now we separate analysis
+  // number of fattags
+  int nfat=0, nbtag=0, nmistag=0;
+  double massDiff; 
+  int minM,minM2,cate=-2;
+  // do a vector with btagged jets and fat btagged jets
+  vector<int> bjets; // list non fat b jets
+  vector<int> fatbjets;
+  vector<int> listNonTag; // list the non tagged
+  for(int i=0;i<jets.size();i++) { 
+    nbtag = nbtag + btag[i]; nmistag = nmistag + bmistag[i];
+    if(btag[i]>0 || (btag[i]==0 && bmistag[i] >0)) { // think on weight later
+      int teste=0;
+      for(int j=0;j<fattag.size();j++) if(fattag[j]==i) {fatbjets.push_back(i);teste=1;} 
+      if(teste==0) bjets.push_back(i);
+    } else listNonTag.push_back(i);
+  }
+  //nbfat = fatbjets.size();// nfat + fattag[i];
+  PseudoJet H1,H2;
+  float Hmin1 = higgs_mass*(1-toleranceH1);
+  float Hmax1 = higgs_mass*(1+toleranceH1);
+  float Hmin2 = higgs_mass*(1-toleranceH2);
+  float Hmax2 = higgs_mass*(1+toleranceH2);
+  double drbb =-1, drbb2 =-1;
+  std::vector<double> a1,a2; 
+  std::vector< int > jetn1, jetn2,jetn3, jetn4; // to keep the pairs resolved
+  std::vector<double> a3; 
+  std::vector< int > jetn11, jetn21; // to keep the pairs 1 tag
+  //////////////////////////////////////////////////////////////
+  if(fatbjets.size() > 1) { // if 2 tag
+    //std::cout<<"2 tag! "<<std::endl;
+    H1=jets.at(fatbjets[0]);
+    H2=jets.at(fatbjets[0]);
+    // quality requirements   
+    massDiff = abs(2*(H1.m() - H2.m())/(H1.m() + H2.m()));
+    double rapDiff = abs(H1.eta() - H2.eta());
+    Xres = H1 +H2;    
+    if( //massDiff1 < tolerance 
+       //&& massDiff2 < tolerance //rapDiff < deltaEtaHH &&
+       1>0
+       && H1.m() > minMH && H2.m() > minMH 
+       && H1.m() > Hmin1 && H1.m() < Hmax1 
+       && H2.m() > Hmin2 && H2.m() < Hmax2
+       && H1.pt() > H1_ptmin && H2.pt() > H2_ptmin  
+       && Xres.pt() > HH_ptmin 
+       && (H1+H2).m() >MHH
+       && Xres.m() < Xmass*(1.+toleranceX)
+       && Xres.m() > Xmass*(1.-toleranceX) 
+       && rapDiff<DetaHH
+      ){ 
+        found=true; cate=2;     
+        // then fill the WBF from the non tagged 
+        if(listNonTag.size()>1) foundvbf = findVBFsimple(jets, vbftag, listNonTag); 
+       }
+        //cout << " category "<<cate<<" mass "<<Xres.m()<<endl;
+        //if(Xres.m()<250) cout << " category "<<2<<" mass "<<Xres.m()<<" btags "<<nbtag <<endl;
+  } // close 2 tag
+  //////////////////////////////////////////////////////////////////////////
+  if(found==false && fatbjets.size() > 0 && bjets.size()>1) { // if 1 tag
+   //std::cout<<"1 tag! "<<std::endl; 
+   // if(nfat>1) {cout<<"ops! "<<endl;}
+   //int nj; for(nj=0; nj< jets.size(); nj++) if(fattag[nj]==1) {
+   H1=jets.at(fatbjets[0]); 
+   // pair H2 the jets by the minimum invariant mass difference with H1
+   double invmassB = 125;// H1.m(); 
+   if(bjets.size()==2) {H2=jets.at(bjets[0])+jets.at(bjets[1]);}
+   else if (bjets.size()>2) {
+    for(int nj1=0; nj1< bjets.size(); nj1++)  if(bjets[nj1]!=fatbjets[0]) 
+     for(int nj2=nj1+1; nj2< bjets.size(); nj2++) if( bjets[nj2]!=fatbjets[0] && bjets[nj2]!=bjets[nj1]) { 
+	   //std::cout<<nj1<<nj2<<" "<<nj3<<nj4<<std::endl; 
+	   double invmassA =  (jets.at(bjets[nj1])+jets.at(bjets[nj2])).m();
+	   a3.push_back((invmassA-invmassB)*(invmassA-invmassB)); 
+	   jetn11.push_back(bjets[nj1]);jetn21.push_back(bjets[nj2]); 
+           // we also what to keep the nj...           
+     } // loop on jets
+      //int minM;
+      //Find the minumum value of the vector (iterator version)
+      minM = TMath::LocMin(a3.size(), &a3[0]);
+      //std::cout<<"hi, the jets pairs are !!!! "<<jetn1[minM]<<jetn2[minM]<<" "
+	//<<fattag[0]<<std::endl;
+      H2=jets.at(jetn11[minM])+jets.at(jetn21[minM]);
+    // quality requirements   
+    // massDiff = abs(2*(H1.m() - H2.m())/(H1.m() + H2.m()));
+    } // close if >2 btag
+    Xres = H1 +H2; 
+    double rapDiff = abs(H1.eta() - H2.eta());
+    if( //massDiff < tolerance && //rapDiff < deltaEtaHH &&
+       1>0
+       && H1.m() > minMH && H2.m() > minMH 
+       && H1.m() > Hmin1 && H1.m() < Hmax1 
+       && H2.m() > Hmin2 && H2.m() < Hmax2
+       && H1.pt() > H1_ptmin && H2.pt() > H2_ptmin  
+       //&& (H1+H2).m() >MHH
+       && Xres.pt() > HH_ptmin 
+       && Xres.m()< Xmass*(1+toleranceX)
+       && Xres.m()> Xmass*(1-toleranceX) 
+       && rapDiff<DetaHH
+//       && abs(jets.at(jetn1[minM]).eta()+jets.at(jetn2[minM]).eta())<DetaH
+      ){ found=true; 
+        //if(Xres.m()<250)
+	cate=1; 
+//if(H2.m() > 110 && H2.m() < 130) cout<<"ops! "<<bjets.size()<<" "<<jets.size()<<" fatjet "<<fattag.size()<<" fatbjet "<<fatbjets.size() <<endl;
+        if(listNonTag.size()>1) foundvbf = findVBFsimple(jets, vbftag, listNonTag); 
+      } // close quality
+      // then fill the WBF from the non tagged 
+      //vector<int> listNonTag; // list the non tagged
+      //for(int nj1=0; nj1< jets.size(); nj1++)
+      //  if(nj1 != fattag[0] || nj1 != jetn11[minM] || nj1 != jetn21[minM]) listNonTag.push_back(nj1); 
+      // if not fat tagged keep
+  } // close if 1 tag
+  //////////////////////////////////////////////////////////////////////
+  if(jets.size() > 5 && found==false) { // resolved
+   // pair the jets by the minimum invariant mass difference
+   //std::cout<<"resolved! "<<std::endl; //cout<<"ops! "<<bjets.size()<<endl; 
+  if (bjets.size()>3) { 
+    for(int nj1=0; nj1< bjets.size(); nj1++)   
+     for(int nj2=0; nj2< bjets.size(); nj2++) 
+       for(int nj3=0; nj3< bjets.size(); nj3++)     
+	 for(int nj4=0; nj4< bjets.size(); nj4++) {
+           if( 1>0
+           && nj1 !=nj2 && nj1 !=nj3 && nj1 !=nj4 
+           && nj2 !=nj3 && nj2 !=nj4 
+           && nj1 !=nj4  
+              ){
+	      double invmassA =  (jets.at(bjets[nj1])+jets.at(bjets[nj2])).m();
+	      double invmassB =  (jets.at(bjets[nj3])+jets.at(bjets[nj4])).m();
+              a2.push_back((invmassA-invmassB)*(invmassA-invmassB)); 
+	      jetn1.push_back(bjets[nj1]);jetn2.push_back(bjets[nj2]); // we also what to keep the nj...
+	      jetn3.push_back(bjets[nj3]);jetn4.push_back(bjets[nj4]);
+           } }// loop on jets
+    //Find the minumum value of the vector (iterator version)
+    minM2 = TMath::LocMin(a2.size(), &a2[0]);
+    //std::cout<<"hi, the jets pairs are !!!! "<<jetn1[minM]<<jetn2[minM]<<" "
+	//<<jetn3[minM]<<jetn4[minM]<<std::endl;
+    H1=jets.at(jetn1[minM2])+jets.at(jetn2[minM2]);
+    H2=jets.at(jetn3[minM2])+jets.at(jetn4[minM2]);  
+    // quality requirements   
+    massDiff = abs(2*(H1.m() - H2.m())/(H1.m() + H2.m()));
+    double rapDiff = abs(H1.eta() - H2.eta());
+    Xres = H1 +H2;
+    if( 
+       //massDiff < tolerance && //rapDiff < deltaEtaHH &&
+       1>0
+       && H1.m() > minMH && H2.m() > minMH 
+       && H1.m() > Hmin1 && H1.m() < Hmax1 
+       && H2.m() > Hmin2 && H2.m() < Hmax2
+       && H1.pt() > H1_ptmin && H2.pt() > H2_ptmin         
+       && (H1+H2).m() >MHH
+       && Xres.pt() > HH_ptmin 
+       && Xres.m()< Xmass*(1.+toleranceX)
+       && Xres.m()> Xmass*(1.-toleranceX) 
+       && rapDiff<DetaHH
+       //&&        H2.m() > 15
+      ){ //std::cout<<"getting there"<<std::endl; 
+	found=true;
+	cate=0;  
+        if(listNonTag.size()>1) foundvbf = findVBFsimple(jets, vbftag, listNonTag); 
+      } // close quality
+      // then fill the WBF from the non tagged 
+      //vector<int> listNonTag; // list the non tagged
+      //for(int nj1=0; nj1< jets.size(); nj1++)
+      //  if(nj1 != jetn1[minM] || nj1 != jetn2[minM] || nj1 != jetn3[minM] || nj1 != jetn4[minM]) 
+      //    listNonTag.push_back(nj1); // if not fat tagged keep
+    } //if not 4 btag 
+  } 
+  //////////////////////////////////////
+  //if(massDiff > 0.1 && nbtag>3) cout << "failed , btags = "<<H1.m()<<" "<<H2.m()<<" "<<cate<<endl;
+  //cout << "Mass hyp = "<<Xmass<<endl;
+  if(found && foundvbf){ 
+       ///////////////////////////
+       // fill the histos
+       ///////////////////////////
+       //cout<<"fat tag = " <<nfat <<" number of plots "<<basicHiggses.size()<<endl;
+       const int numvar1=16;
+       if( 
+         (cate==0 ) ||
+         (cate==1 ) ||
+         (cate==2 )
+         ){
+        //if(H1.m()>130) cout << " category "<<cate<<" mass "<<Xres.m()<<" nbtag "<<nbtag<<endl;
+         Cat->Fill(cate,weight);
+         //cout << " category "<<cate<<"higgses mass "<<H1.m()<<" "<<H2.m()<<endl;
          double monovar[numvar1] = {
           H1.m(),H1.pt(),H1.eta(),H1.phi(), //4
           H2.m(),H2.pt(),H2.eta(),H2.phi(), // 4
@@ -341,7 +593,7 @@ bool analyse_4b(
          ///////////////////////////
          // fill the jet histos
          ///////////////////////////
-         const int numvar2=10;
+         const int numvar2=10; 
          PseudoJet vbfmass = jets.at(vbftag[0]) +jets.at(vbftag[1]); 
          double Deta = abs(jets.at(vbftag[0]).eta() -jets.at(vbftag[1]).eta());
          //cout<<"plots vbf "<<basicvbf.size()<<endl;
@@ -357,10 +609,10 @@ bool analyse_4b(
          ////////////////////////////////
          //basicLeptons
          const int numvar3=12;
-         if(minM2 >0) {
+         /* if(minM2 >0) { 
             drbb=jets.at(jetn1[minM2]).delta_R(jets.at(jetn2[minM2]));//
             drbb2=jets.at(jetn3[minM2]).delta_R(jets.at(jetn4[minM2]));
-         } else if(minM >0) {drbb=jets.at(jetn11[minM]).delta_R(jets.at(jetn21[minM])); drbb2=0;}
+         } else if(minM >0) {drbb=jets.at(jetn11[minM]).delta_R(jets.at(jetn21[minM])); drbb2=0;} cout <<"here2"<< endl; */
          double monovarlep[numvar3] = {0,0,0,0,0,0,0,0,0,drbb,drbb2,0}; //25
          for (int j=0; j<basicLeptons.size(); j++) basicLeptons[j]->Fill(monovarlep[j],weight); // weight
        } // close if correct btag
@@ -368,19 +620,55 @@ bool analyse_4b(
   }  // close if fill 
   //else cout << " category "<<nfat<<" mass "<<Xres.m()<<" btags "<<nbtag <<endl;
 return found; // close if 2 tags
-} // close 4b analysis
+} // close 4b analysis prior higgs reco
+/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
+bool findVBFsimple(vector<PseudoJet> jets, vector<int> & vbftag, vector<int> & listNonTag){
+    // find the hightest inv mass pair among jets 
+    std::vector<double> a1; 
+    std::vector< int > jetn1, jetn2; // to keep the pairs
+    for(int nj1=0; nj1< listNonTag.size(); nj1++) 
+	for(int nj2=nj1+1; nj2< listNonTag.size(); nj2++) { // we also what to keep the nj...
+	  double invmass =  (jets.at(listNonTag[nj1])+jets.at(listNonTag[nj2])).m();
+	  a1.push_back(invmass); jetn1.push_back(listNonTag[nj1]);jetn2.push_back(listNonTag[nj2]);
+    } // loop on jets  
+    //
+    int i1; i1 = TMath::LocMax(a1.size(), &a1[0]); // max inv mass
+    vbftag.push_back(jetn1[i1]); vbftag.push_back(jetn2[i1]); // save the pair number
+    double etaVBF = abs(jets.at(vbftag[0]).eta()-jets.at(vbftag[1]).eta());
+    double MJJ = (jets.at(vbftag[0])+jets.at(vbftag[1])).m();
+    if( 1>0 
+        && MJJ > Mjj && etaVBF > DeltayVBF
+        && jets.at(vbftag[0]).delta_R(jets.at(vbftag[1])) > DeltaRVBF
+        && (jets.at(vbftag[0])+jets.at(vbftag[1])).pt() > PTjj
+        && jets.at(vbftag[0]).pt()>jet1_ptminvbf
+        && jets.at(vbftag[1]).pt()>jet2_ptminvbf
+        && jets.at(vbftag[0]).eta() < etaj
+        && jets.at(vbftag[1]).eta() < etaj
+      ){ // apply the VBF cuts
+       // std::cout<<"hi VBF jets really are !!!! "<<vbftag[0]<<" "<<vbftag[1]<<std::endl;
+       //    cout << " dijet mass "<<(jets.at(vbftag[0])+jets.at(vbftag[1])).m() <<endl;
+       //  cout << " dijet btag "<<btag[vbftag[0]]<<btag[vbftag[1]] <<endl;
+    return true;
+  } else return false; // close VBF cuts
+} // close VBF selection
 /////////////////////////////////////////////////////////////////
 bool findVBF(vector<PseudoJet> jets, vector<int> fattag, vector<int> btag, vector<int> bmistag, vector<int> & vbftag){
   // highest invariant mass among the non-tagged
   vector<int> listNonTag; // list the non tagged
   for(int nj1=0; nj1< jets.size(); nj1++) { 
-  //cout<<"fat tagged = " <<fattag[nj1]<<" b-quarks mistagged = " <<bmistag[nj1] <<" b-quark = " <<btag[nj1] <<endl;
+  //cout<<"fat tagged = " <<fattag[nj1]<<" b-quarks mistagged = 
+  //" <<bmistag[nj1] <<" b-quark = " <<btag[nj1] <<endl;
 	if(1>0
-           && (1>0
           // && fattag[nj1]==0 
-           && btag[nj1] ==0 
-           //&& bmistag[nj1]==0
-           ) ) {listNonTag.push_back(nj1);}
+           && btag[nj1] ==0 // if not b tagged see
+           //&& bmistag[nj1]==0 // if not b mis tagged see
+           ) {
+               int found=0;
+               //for(int nj2=0; nj2< fattag.size(); nj2++)  
+               //   {if(fattag[nj2]==nj1){found=1; break;}}
+               if(found==0) listNonTag.push_back(nj1); // if not fat tagged keep
+             }
   }
   if(listNonTag.size()>1){   // find the hightest inv mass pair 
     int nfat=0, nbtag=0, nmistag=0;
@@ -400,7 +688,9 @@ bool findVBF(vector<PseudoJet> jets, vector<int> fattag, vector<int> btag, vecto
     double etaVBF = abs(jets.at(vbftag[0]).eta()-jets.at(vbftag[1]).eta());
     double MJJ = (jets.at(vbftag[0])+jets.at(vbftag[1])).m();
     if( 1>0 
-        && MJJ > Mjj && etaVBF > DeltayVBF 
+        && MJJ > Mjj && etaVBF > DeltayVBF
+        && jets.at(vbftag[0]).delta_R(jets.at(vbftag[1])) > DeltaRVBF
+        && (jets.at(vbftag[0])+jets.at(vbftag[1])).pt() > PTjj
         && jets.at(vbftag[0]).pt()>jet1_ptminvbf
         && jets.at(vbftag[1]).pt()>jet2_ptminvbf
         && jets.at(vbftag[0]).eta() < etaj
@@ -427,101 +717,80 @@ int recojets(vector<PseudoJet> particles,vector<PseudoJet> & jets_akt, vector<in
     jets_akt = sorted_by_pt(jet_selector(cs_akt.inclusive_jets()));
   }
   else{
-    double const ptmin=jet_ptmin;
+    double const ptmin=0.0; // if parton jet pt min zero
     Selector jet_selector_parton = SelectorPtMin(ptmin);
     jets_akt = sorted_by_pt(jet_selector_parton(cs_akt.inclusive_jets()));
-/*
-//////////////////
-for (int i=0; i<jets_akt.size(); i++){
-  vector<PseudoJet> constitu=jets_akt.at(i).constituents();
-  cout<<"constituents size "<<constitu.size()<<endl;
-  for (int j=0; j<constitu.size(); j++) {
-    //int test=constitu.at(j).user_index();
-    cout<<"constituents flavour "<< constitu.at(j).user_index()<<endl;
-  }
-}
-//////////////////
-*/
-//  if(jets_akt.size()==5) {
-//   cout<<"------------------------"<<endl;
-//   for (int i=0; i<jets_akt.size(); i++) if(jets_akt.at(i).constituents().size() ==2 && jets_akt.at(i).m()<120) cout<< jets_akt.at(i).m()<<" "<<" "<<endl;
-//  }
   }
   int njets = jets_akt.size();
+  cout<<njets<<endl;
   Njets_passing_kLooseID->Fill(njets,weight);
   isbtagged(jets_akt, btag, bmistag); // check wheather the b(c)jet is b--(mis)tagable
-  /////////////////////////////////////////////////////////////////////////////////////////
   ///////////////////// check tag
   JetDefinition CA10(cambridge_algorithm, Rsb);
   // Filter definition to improve mass resolution
   Filter filter(JetDefinition(cambridge_algorithm, Rfilt), SelectorNHardest(n_subjet));
   PseudoJet tagged_jet;
-  for (int i = 0; i < jets_akt.size(); i++) {
-    int see=0;
+  for (int i = 0; i < jets_akt.size(); i++) { // to each akt jet
     // first recluster with some large CA (needed for mass-drop)
     ClusterSequence cs_tmp(jets_akt[i].constituents(), CA10);
     // next get hardest jet
     PseudoJet ca_jet = sorted_by_pt(cs_tmp.inclusive_jets())[0]; // find the cores
     // now run mass drop tagger
     MassDropTagger md_tagger(mu, ycut); // define the cut on mass drop
-	// mu: ratio in between mass of cores, symetric splitting
+    // mu: ratio in between mass of cores, symetric splitting
     tagged_jet = md_tagger(ca_jet);
     if(tagged_jet.m()>10) {
       PseudoJet filtered_jet = filter(jets_akt.at(i)); // filter to tag
       if(filtered_jet.m()>Mfat) fattag.push_back(i); //see = 1; else see = 0; // no fat tag 
     } //else see = 0; 
-    
   } // close find mass drop
-  ////////////////////////////////////////////////////////////////////////////////////////////////
   //jets = jets_akt;
+  //////////////////////////// see n-subjetiness
+  /* for (int i = 0; i < jets_akt.size(); i++) { // to each akt jet
+    // want the 31 and 21, by now the basic usage of 21
+    double beta = 1.0; // beta
+    UnnormalizedMeasure measureSpec1(beta);
+    OnePass_WTA_KT_Axes     axisMode1;
+    //Njettiness::AxesMode axisMode;
+    //axisMode = Njettiness::onepass_kt_axes;
+    NsubjettinessRatio nSubRatio21(2, 1, axisMode1, measureSpec1);
+    double tau21 = nSubRatio21(jets_akt[i]);
+  } // to each kt jet */
   return njets;
 } // close cluster jets
-/////////
+////////////////////////////////////////////////////////////////////////////////////////////////
 void isbtagged(vector<PseudoJet> jets, vector<int> & btag, vector<int> & bmistag){ 
   for (int i=0; i<jets.size(); i++) { // check wheter jet have inside a b's are taggable 
   int see=0,see2=0;
      vector<PseudoJet> constitu=jets.at(i).constituents();
      for (int j=0; j<constitu.size(); j++) {
        //cout<<"constituents flavour "<<constitu.at(j).user_index()<<endl;
-       if((constitu.at(j).user_index() == 5 || constitu.at(j).user_index() == -5 ) // work !!
+       if((constitu.at(j).user_index() == 5 || constitu.at(j).user_index() == -5) // work !!
             && constitu.at(j).pt() > bjetpt
 	    && constitu.at(j).eta() < etab
           ) {see++;}//btag.push_back(1);} else btag.push_back(0); 
        if( abs(constitu.at(j).user_index()) == 4  // work !! 
-	    && constitu.at(j).pt() > 10
+            && constitu.at(j).pt() > bjetpt
+	    && constitu.at(j).eta() < etab
          ) {see2++;}// bmistag.push_back(1);} bmistag.push_back(0);
      } // close constituents
      //bmistag.push_back(see2);
-     if(see>0) btag.push_back(1); else btag.push_back(0); // count only one tag/jet
+     btag.push_back(see); //else btag.push_back(0); // count all tag/jet
+//     if(see>0) btag.push_back(1); else btag.push_back(0); // count only one tag/jet
      if(see2>0) bmistag.push_back(1); else bmistag.push_back(0); // count only one tag/jet
      //cout<<"b-quarks mistagged = " <<bmistag[i] <<" b-quark = " <<btag[i] <<endl;
   } // close for each jet
-
-
 } // close isbtagged
-//////////////////////////////////////////////////////////////////////////////////////////////
-void istagged(vector<PseudoJet> jets, vector<int> & fattag){
-//  for (int i=0; i<jets.size(); i++) { // check wheter b's are taggable 
-//     int see=0;
-//     if( jets.at(i).m() > 100) see = 1; else see = 0; 
-//     fattag.push_back(see);
-//  } // close for each jets
-  // do not filter yet
-//  if(jets.size()==5) {
-//   cout<<"------------------------"<<endl;
-//   for (int i=0; i<jets.size(); i++) if(fattag[i]==0) cout<< jets.at(i).m()<<" "<<endl;
-//  }
-} // close istagged
 /////////////////////////////////////////////////////////////////////////
 // save the histos
 int save_hist(int nmass, bool resonant,bool bkg, bool fourb){
   const char* Mass;
   if(resonant && !bkg) {
-    if(fourb) Mass = Form("bulk_graviton_mad/Control_shower_%d.root",nmass);
+    if(fourb) Mass = Form("spin0/Control_shower_%d.root",nmass);
     if(!fourb) Mass = Form("bulk_graviton_mad_WWbb/Control_shower_%d.root",nmass);
     //Mass = Form("histos/Madgraph0_0137/Control_shower_%d.root",nmass);
   }
-  else if(!bkg && fourb) Mass = Form("histosnonres/Control_shower_%d.root",nmass);
+  else if(!bkg && fourb) Mass = Form("nonresonant/Control_shower_%d.root",nmass);
   else if(!bkg && !fourb) Mass = Form("nonresWWbb/Control_shower_%d.root",nmass);
   else Mass = Form("4bsbkg/Control_shower_%d.root",nmass);
   TFile f1(Mass, "recreate");
@@ -571,7 +840,7 @@ int decla(int mass){
 	TH1D *H1hist = new TH1D("H1hist",  
 		label, 
 		90, -10, 385);
-	H1hist->GetYaxis()->SetTitle("Events/ 2 GeV");
+	//H1hist->GetYaxis()->SetTitle("Events              .");
 	H1hist->GetXaxis()->SetTitle("M_{H1} (GeV)");
 	basicHiggses.push_back (H1hist); 
 
@@ -636,7 +905,7 @@ int decla(int mass){
 	
 	TH1D *Radion_pt = new TH1D("radion_pt_ct4",  
 		label, 
-		50, 0, 300);
+		80, 0, 800);
 	Radion_pt->GetYaxis()->SetTitle("");
 	Radion_pt->GetXaxis()->SetTitle("Pt_{HH} (GeV)");
 	basicHiggses.push_back (Radion_pt);
@@ -695,7 +964,7 @@ int decla(int mass){
 
 	TH1D *j1histpt = new TH1D("j1histpt",  
 		label, 
-		30, 20, 300);
+		80, 20, 2000);
 	j1histpt->GetYaxis()->SetTitle("Events/ 2 GeV");
 	j1histpt->GetXaxis()->SetTitle("vbf j1 P_T (GeV)");
 	basicvbf.push_back (j1histpt); 
@@ -711,7 +980,7 @@ int decla(int mass){
 
 	TH1D *j2histpt = new TH1D("j2histpt",  
 		label, 
-		30, 20, 100);
+		80, 20, 400);
 	j2histpt->GetYaxis()->SetTitle("Events/ 2 GeV");
 	j2histpt->GetXaxis()->SetTitle("vbf j2 P_T (GeV)");
 	basicvbf.push_back (j2histpt); 
@@ -727,7 +996,7 @@ int decla(int mass){
 
 	TH1D *RRadMassvbf = new TH1D("RadMass_ct4vbf",  
 		label, 
-		80, 50, 1200);
+		80, 50, 5000);
 	RRadMassvbf->GetXaxis()->SetTitle("vbf M_{j j} (GeV)");
 	basicvbf.push_back (RRadMassvbf);
 
@@ -735,7 +1004,7 @@ int decla(int mass){
 
 	TH1D *RRadPtvbf = new TH1D("RadPt_ct4vbf",  
 		label, 
-		60, 50, 250);
+		90, 50, 850);
 	RRadPtvbf->GetXaxis()->SetTitle("vbf pt_{j j} (GeV)");
 	basicvbf.push_back (RRadPtvbf);
 
@@ -849,8 +1118,8 @@ int decla(int mass){
 
 	TH1D *MetMass1 = new TH1D("MetMass1_ct4",  
 		label, 
-		50, 0, 750);
-	MetMass1->GetXaxis()->SetTitle("M_{ #nu#nu } (GeV)");
+		50, 0, 300);
+	MetMass1->GetXaxis()->SetTitle("MET (GeV)");
 	basicLeptons.push_back (MetMass1);
 
 return 1;

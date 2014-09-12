@@ -2,12 +2,12 @@
 // Analysis
 bool fourb=true;
 bool resonant=true;
-bool bkg = true;
+bool bkg = false;
 //
-int const nevent=500000;
+int const nevent=100;
 // for bkg
-int const components =11;
-int comp[components] = {0,1,2,3,4,5,6,7,8,9,10}; 
+int const components =15;
+int comp[components] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14}; 
 string bkgfilenames[components]={
 "zbbbbjj_20_10k_noVBF", // 10k
 "zbbzbbjj_20_10k_noVBF", // 10k
@@ -19,7 +19,11 @@ string bkgfilenames[components]={
 "uu__4buu", // 2.3k events
 "4b2j_alpgen", //500 k
 "t_wbt_wbjj", // 100kevents
-"wwbbjj_ptb20" // 10k
+"wwbbjj_ptb20", // 10k
+"mG400_bulk_veronica14tev",
+"M_400_8tev",
+"M_400_10tev",
+"M_400_14tev"
 };
 // for nonresonant
 int const parameters=9;

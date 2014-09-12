@@ -22,6 +22,9 @@ bool findVBF(vector<PseudoJet> jets, vector<int> fattag, vector<int> btag, vecto
 // analysis
 bool analyse_4b(
 	vector<PseudoJet> jets, vector<int> fattag, vector<int> btag, vector<int> bmistag,vector<int> vbftag, int);
+bool analyse_4b_prior(
+	vector<PseudoJet> jets, vector<int> fattag, vector<int> btag, vector<int> bmistag,
+        vector<int> vbftag, int Xmass);
 //bool jets_semi_hadronic( ); // deal with the 2 jets of a bbXX decay, where X is not q/g
 bool analyse_2b2w(vector<PseudoJet> jets, vector<int> fattag, vector<int> btag, vector<int> bmistag,vector<int> vbftag,
 	vector<PseudoJet> leptons, vector<PseudoJet> neutrinos);

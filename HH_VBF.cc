@@ -17,18 +17,23 @@ int main() {
   // input
   vector<string> filename;
   string file, path,data;
+/*
   int points;
   if(resonant && !bkg) {
       //path="bulk_graviton/RSG_WBF_hh-Mhh"; points = masses;
-      if(fourb) path="spin0/Mh2_bulk_"; points = masses;
+      if(fourb) path="/afs/cern.ch/work/a/acarvalh/phenoHH/model_LHEfiles/spin0_hh_13tev/Mh2_bulk_"; points = masses;
       if(!fourb) path="bulk_graviton_mad_WWbb/MGraviton_"; points = masses;       
   }
   else if (!bkg && fourb) {path="nonresonant/pp_hh_vbf_"; points = parameters;}//nonresWWbb
   else if (!bkg && !fourb) {path="nonresWWbb/pp_hh_vbf_"; points = parameters;}//
   else {path="4bsbkg/"; points = components;}
   data = ".lhe.decayed.shower";
+*/
+  path="/afs/cern.ch/work/a/acarvalh/phenoHH/model_LHEfiles/spin0_hh_13tev/Mh2_bulk_"; 
+  unsigned int points = masses;
+
   //  
-  for(int i=0;i<points;i++){
+  for(unsigned int i=0;i<points;i++){
     if(resonant && !bkg) {
       ostringstream o;
       o << "" << mass[i];//filenames
@@ -41,21 +46,21 @@ int main() {
   //////////////////////////////////////////////////////////////////////////////////////
   ifstream in1;
   // declare the root plots to be done
-  decla(0);
-  for(int i=0;i<1;i++){ // for each mass
+//  decla(0);
+  for(unsigned int i=0;i<1;i++){ // for each mass
   //  for(int i=0;i<2;i++){ // for each mass
   //  for(int i=8;i<9;i++){ // for each mass
   //  for(int i=11;i<15;i++){ // for each mass
     cout<<"\n\n reading file = "<<filename.at(i)<<endl;
     in1.open(filename.at(i).c_str());
-    for(int ievent=0;ievent<nevent;ievent++){ // for each event  // 
+    for(unsigned int ievent=0;ievent<nevent;ievent++){ // for each event  // 
     //for(int ievent=0;ievent<20;ievent++){ // for each event  // 
         //cout<<"----------------------------------------------------"<<endl;
         string c;
         in1>>c;
         double Px, Py , Pz, E;
         int pID;
-        int nparticles;
+        unsigned int nparticles;
         vector<PseudoJet> particles; 
         vector<PseudoJet> neutrinos;
         vector<PseudoJet> leptons;
@@ -63,9 +68,9 @@ int main() {
         vector<PseudoJet> higgses;                    
         int nb = 0;
         int nvbf = 0;
-        in1>>nparticles;  int counter=0,counterh=0,counterl=0,countern=0;
+        in1>>nparticles; unsigned int counter=0,counterh=0,counterl=0,countern=0;
    cout<<nparticles<<endl; 
-        for(int ipart=0;ipart<nparticles;ipart++){ // loop on particles
+        for(unsigned int ipart=0;ipart<nparticles;ipart++){ // loop on particles
           in1 >> pID >> Px >> Py >> Pz >> E ;//>> idup;
           //cout<< pID <<endl;   
           if (abs(pID) < 6 || pID==21){  // if a quark/gluon -- neglect hadrons
@@ -85,6 +90,7 @@ int main() {
 		countern++;
           }
         } // finish to read all particles
+return 0;
         //if(nb!=4) {cout<<"not correct b quarks number "<<nb<<endl; exit(-10); }
 	if(counterh==2) genhiggs(counterh, higgses);
         // construct the jets
@@ -111,9 +117,9 @@ int main() {
     fattag.clear();
     btag.clear();
     } // close for event
-    if(resonant && !bkg) save_hist(mass[i],resonant,bkg,fourb); 
-    else if(!bkg) save_hist(parameter[i],resonant,bkg,fourb);
-    else save_hist(comp[i],resonant,bkg,fourb);
+ //   if(resonant && !bkg) save_hist(mass[i],resonant,bkg,fourb); 
+ //   else if(!bkg) save_hist(parameter[i],resonant,bkg,fourb);
+ //   else save_hist(comp[i],resonant,bkg,fourb);
     in1.close();
   } // close for each mass
 }

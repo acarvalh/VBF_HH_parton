@@ -4,9 +4,9 @@ bool fourb=true;
 bool resonant=true;
 bool bkg = false;
 //
-int const nevent=100;
+unsigned int nevent=100;
 // for bkg
-int const components =15;
+const int components =15;
 int comp[components] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14}; 
 string bkgfilenames[components]={
 "zbbbbjj_20_10k_noVBF", // 10k
@@ -26,7 +26,7 @@ string bkgfilenames[components]={
 "M_400_14tev"
 };
 // for nonresonant
-int const parameters=9;
+const int parameters=9;
 int parameter[parameters]={
 101010,1000,1001,
 51010,151010,
@@ -48,7 +48,7 @@ string filenames[parameters]={
 "BSM_13tev_VBFcuts_CV_p1p0_C2V_p1p0_C3_p2p0"
 };
 // for resonant
-int const masses=26;
+const int masses=26;
 int mass[masses]={260,300 ,350 ,400 ,450 ,500 ,
 		      550 ,600 ,650 ,700 ,750,
 		      800 ,850 ,900 ,950 ,1000,

@@ -1,7 +1,7 @@
 /////////////////////////////////
 // cuts
 double const  weight =1./20000;//0.001;//
-double Mjj =400;//400; 
+double Mjj =0;//400; 
 double PTjj = 0;//400; 
 double DeltayVBF = 0;//3;
 double DeltaRVBF = 0;//3;

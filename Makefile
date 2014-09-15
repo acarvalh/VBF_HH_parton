@@ -34,12 +34,12 @@ MDIR = ./
 #LHAPDFLIBS = -L$(LHAPDFDIR) -lLHAPDF
 
 # fastjet
-FJINCS = $(shell /afs/cern.ch/sw/lcg/external/fastjet/3.0.6/x86_64-slc5-gcc43-opt/bin/fastjet-config --cxxflags)
-FJCLIBS    = $(shell /afs/cern.ch/sw/lcg/external/fastjet/3.0.6/x86_64-slc5-gcc43-opt/bin/fastjet-config --libs)
+FJINCS = $(shell /home/xanda/Documents/fastjet-install/bin/fastjet-config --cxxflags)
+FJCLIBS = $(shell /home/xanda/Documents/fastjet-install/bin/fastjet-config --libs)
 
 # root
-ROOTINCS = $(shell /afs/cern.ch/sw/lcg/app/releases/ROOT/5.32.00/x86_64-slc5-gcc43-opt/root/bin/root-config --cflags) 
-ROOTLIBS = $(shell /afs/cern.ch/sw/lcg/app/releases/ROOT/5.32.00/x86_64-slc5-gcc43-opt/root/bin/root-config --glibs) 
+ROOTINCS = $(shell /home/xanda/root/bin/root-config --cflags)
+ROOTLIBS = $(shell /home/xanda/root/bin/root-config --glibs) 
 
 # scheduling and optimization options (such as -DSSE -DSSE2 -DP4) 
 CFLAGS = -ansi -O3 -Wall  

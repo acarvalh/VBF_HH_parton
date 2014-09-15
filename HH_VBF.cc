@@ -29,9 +29,12 @@ int main() {
   else {path="4bsbkg/"; points = components;}
   data = ".lhe.decayed.shower";
 */
-  path="/afs/cern.ch/work/a/acarvalh/phenoHH/model_LHEfiles/spin0_hh_13tev/Mh2_bulk_"; 
+//  path="bulk_graviton_mad/MGraviton_"; 
+//  unsigned int points = masses;
+//  data = ".lhe.decayed";
+  path="spin0/Mh2_bulk_"; 
   unsigned int points = masses;
-
+  data = ".lhe.decayed.shower";
   //  
   for(unsigned int i=0;i<points;i++){
     if(resonant && !bkg) {
@@ -46,8 +49,8 @@ int main() {
   //////////////////////////////////////////////////////////////////////////////////////
   ifstream in1;
   // declare the root plots to be done
-//  decla(0);
-  for(unsigned int i=0;i<1;i++){ // for each mass
+  decla(0);
+  for(unsigned int i=1;i<2;i++){ // for each mass
   //  for(int i=0;i<2;i++){ // for each mass
   //  for(int i=8;i<9;i++){ // for each mass
   //  for(int i=11;i<15;i++){ // for each mass
@@ -69,7 +72,7 @@ int main() {
         int nb = 0;
         int nvbf = 0;
         in1>>nparticles; unsigned int counter=0,counterh=0,counterl=0,countern=0;
-   cout<<nparticles<<endl; 
+   //cout<<nparticles<<" wtf! "<<endl; 
         for(unsigned int ipart=0;ipart<nparticles;ipart++){ // loop on particles
           in1 >> pID >> Px >> Py >> Pz >> E ;//>> idup;
           //cout<< pID <<endl;   
@@ -90,7 +93,6 @@ int main() {
 		countern++;
           }
         } // finish to read all particles
-return 0;
         //if(nb!=4) {cout<<"not correct b quarks number "<<nb<<endl; exit(-10); }
 	if(counterh==2) genhiggs(counterh, higgses);
         // construct the jets
@@ -101,6 +103,7 @@ return 0;
 	vector<int> btag; vector<int> bmistag; // number of btags/bmistags of each jet entry 
 	vector<int> fattag;
         int njets = recojets(particles, jets,btag,bmistag,fattag);
+        particles.clear();
 	//cout<<"njets "<<njets<<endl; 
         //istagged(jets, fattag); // check wheather the jet is fat -- by now only invariant mass
 	// VBF combinatorics and cuts
@@ -117,9 +120,9 @@ return 0;
     fattag.clear();
     btag.clear();
     } // close for event
- //   if(resonant && !bkg) save_hist(mass[i],resonant,bkg,fourb); 
- //   else if(!bkg) save_hist(parameter[i],resonant,bkg,fourb);
- //   else save_hist(comp[i],resonant,bkg,fourb);
+    if(resonant && !bkg) save_hist(mass[i],resonant,bkg,fourb); 
+    else if(!bkg) save_hist(parameter[i],resonant,bkg,fourb);
+    else save_hist(comp[i],resonant,bkg,fourb);
     in1.close();
   } // close for each mass
 }

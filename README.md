@@ -9,6 +9,8 @@ uses the output of the main11.cc commited here
 
 .................................................................
 
+source /afs/cern.ch/sw/lcg/app/releases/ROOT/5.32.00/x86_64-slc5-gcc43-opt/root/bin/thisroot.sh
+
 mkdir histos
 
 make HH_VBF (fix your root and fastjet paths on the Makefile)

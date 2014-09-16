@@ -66,35 +66,35 @@ int nmass = 68;
 
 const char* channel[nmass]={
 "nonresonant/Control_shower_1001.root", //1
-"spin0/Control_shower_260.root",//2
-"spin0/Control_shower_300.root",//3
-"spin0/Control_shower_350.root",//4
+"spin0/shower/Control_shower_260.root",//2
+"spin0/shower/Control_shower_300.root",//3
+"spin0/shower/Control_shower_350.root",//4
 //"olivierMar14/MGraviton__500_HHtobbbb_NoPileUp.root",//2
 //"olivierMar14/MGraviton__500_HHtobbbb_50PileUp.root",//3
 //"olivierMar14/MGraviton__500_HHtobbbb_140PileUp.root",//4
-"spin0/Control_shower_400.root",//5
-"spin0/Control_shower_450.root",//6
-"spin0/Control_shower_400.root",//7
-"spin0/Control_shower_550.root",//8
-"spin0/Control_shower_550.root",//9
-"spin0/Control_shower_550.root",//10
-"spin0/Control_shower_700.root",//11
-"spin0/Control_shower_750.root",//12
-"spin0/Control_shower_800.root",//13
-"spin0/Control_shower_850.root",//14
-"spin0/Control_shower_900.root",//15
-"spin0/Control_shower_950.root",//16
-"spin0/Control_shower_1000.root",//17
-"spin0/Control_shower_1050.root",//18
-"spin0/Control_shower_1100.root",//19
-"spin0/Control_shower_1150.root",//20
-"spin0/Control_shower_1200.root",//21
-"spin0/Control_shower_1250.root",//22
-"spin0/Control_shower_1300.root",//23
-"spin0/Control_shower_1350.root",//24
-"spin0/Control_shower_1400.root",//25
-"spin0/Control_shower_1450.root",//26
-"spin0/Control_shower_1500.root",//27
+"spin0/shower/Control_shower_400.root",//5
+"spin0/shower/Control_shower_450.root",//6
+"spin0/shower/Control_shower_500.root",//7
+"spin0/shower/Control_shower_550.root",//8
+"spin0/shower/Control_shower_600.root",//9
+"spin0/shower/Control_shower_650.root",//10
+"spin0/shower/Control_shower_700.root",//11
+"spin0/shower/Control_shower_750.root",//12
+"spin0/shower/Control_shower_800.root",//13
+"spin0/shower/Control_shower_850.root",//14
+"spin0/shower/Control_shower_900.root",//15
+"spin0/shower/Control_shower_950.root",//16
+"spin0/shower/Control_shower_1000.root",//17
+"spin0/shower/Control_shower_1050.root",//18
+"spin0/shower/Control_shower_1100.root",//19
+"spin0/shower/Control_shower_1150.root",//20
+"spin0/shower/Control_shower_1200.root",//21
+"spin0/shower/Control_shower_1250.root",//22
+"spin0/shower/Control_shower_1300.root",//23
+"spin0/shower/Control_shower_1350.root",//24
+"spin0/shower/Control_shower_1400.root",//25
+"spin0/shower/Control_shower_1450.root",//26
+"spin0/shower/Control_shower_1500.root",//27
 // bkgs 4b
 "4bsbkg/Control_shower_0.root",//28
 "4bsbkg/Control_shower_1.root",//29
@@ -155,7 +155,7 @@ const char* channel[nmass]={
 const char* lege[nmass]={"SM H",
                          "260 GeV","300 GeV","350 GeV",
                          //"no pileup", "LHC Run 3","HL-LHC ",
-                         "400 GeV  ","450 GeV","400 old 8 TeV",
+                         "400 GeV","450 GeV","500 GeV",
                          "550 GeV","600 GeV","650 GeV","700 GeV","750 GeV",
 			 "800 GeV","850 GeV","900 GeV","950 GeV",
                          "1000 GeV","1050 GeV","1100 GeV","1150 GeV",
@@ -190,9 +190,9 @@ double masses[maxtodo] = { 0,0,0,0};//,1, 260, 260, 260, 260 };//,
 */
 
 // 4b
-int maxtodo=14; 
-int todo[maxtodo]={0,1,2,3,4,5,7,8,9,10,11,12,15,21};//3 ,2 ,1 };//27,28,34, // 0,21,16,13, 9 ,5 ,
-double masses[maxtodo] = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14};//,
+int maxtodo=6; 
+int todo[maxtodo]={1,2,3,4,5,6};//3 ,2 ,1 };//27,28,34, // 0,21,16,13, 9 ,5 ,
+double masses[maxtodo] = {1,2,3,4,5,6};//,
 
 /////////////////
 // 4b all

@@ -32,7 +32,7 @@ int main() {
 //  path="bulk_graviton_mad/MGraviton_"; 
 //  unsigned int points = masses;
 //  data = ".lhe.decayed";
-  path="spin0/Mh2_bulk_"; 
+  path="spin0/shower/Mh2_bulk_"; 
   unsigned int points = masses;
   data = ".lhe.decayed.shower";
   //  
@@ -50,7 +50,7 @@ int main() {
   ifstream in1;
   // declare the root plots to be done
   decla(0);
-  for(unsigned int i=1;i<2;i++){ // for each mass
+  for(unsigned int i=0;i<6;i++){ // for each mass
   //  for(int i=0;i<2;i++){ // for each mass
   //  for(int i=8;i<9;i++){ // for each mass
   //  for(int i=11;i<15;i++){ // for each mass
@@ -116,9 +116,9 @@ int main() {
           else if (counterl>1 && countern>1) reco = analyse_2b2w(jets,fattag,btag,bmistag,vbftag,leptons,neutrinos); else cout<<"number of b particles = "<< nb<<" number of leptons = "<< counterl<<" number of neutrinos = "<< countern<<" number of jets = "<< nvbf<<" event "<< ievent<<endl;   
         } // close pass VBF
         //
-    jets.clear();
-    fattag.clear();
-    btag.clear();
+//    jets.clear();
+//    fattag.clear();
+//    btag.clear();
     } // close for event
     if(resonant && !bkg) save_hist(mass[i],resonant,bkg,fourb); 
     else if(!bkg) save_hist(parameter[i],resonant,bkg,fourb);

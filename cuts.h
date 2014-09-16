@@ -42,9 +42,9 @@ int const n_subjet =3;
 ///////////////////////////////////
 // on the 4b's analysis
 double const minMH=0;
-double const toleranceH2=150;
-double const toleranceH1=150;
-double const toleranceX=200;
+double const toleranceH2=0.150;
+double const toleranceH1=0.150;
+double const toleranceX=0.200;
 double const HThiggses = 0;
 double const DetaHH = 20;//1.3;
 double const DetaH = 150;//1.5;

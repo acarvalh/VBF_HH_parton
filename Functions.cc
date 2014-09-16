@@ -310,7 +310,7 @@ bool analyse_4b(
               ){
 	      double invmassA =  (jets.at(nj1)+jets.at(nj2)).m();
 	      double invmassB =  (jets.at(nj3)+jets.at(nj4)).m();
-              if(invmassA< 50 || invmassB<50) a2.push_back(100000000); else
+              //if(invmassA< 50 || invmassB<50) a2.push_back(100000000); else
                  a2.push_back((invmassA-invmassB)*(invmassA-invmassB)); 
 	      jetn1.push_back(nj1);jetn2.push_back(nj2); // we also what to keep the nj...
 	      jetn3.push_back(nj3);jetn4.push_back(nj4);
@@ -680,7 +680,7 @@ bool findVBF(vector<PseudoJet> jets, vector<int> fattag, vector<int> btag, vecto
   //" <<bmistag[nj1] <<" b-quark = " <<btag[nj1] <<endl;
 	if(1>0
           // && fattag[nj1]==0 
-          // && btag[nj1] ==0 // if not b tagged see
+           && btag[nj1] ==0 // if not b tagged see
            //&& bmistag[nj1]==0 // if not b mis tagged see
            ) {
                int found=0;
@@ -808,7 +808,7 @@ void isbtagged(vector<PseudoJet> jets, vector<int> & btag, vector<int> & bmistag
 int save_hist(int nmass, bool resonant,bool bkg, bool fourb){
   const char* Mass;
   if(resonant && !bkg) {
-    if(fourb) Mass = Form("spin0/Control_shower_%d.root",nmass);
+    if(fourb) Mass = Form("spin0/shower/Control_shower_%d.root",nmass);
     if(!fourb) Mass = Form("bulk_graviton_mad_WWbb/Control_shower_%d.root",nmass);
     //Mass = Form("histos/Madgraph0_0137/Control_shower_%d.root",nmass);
   }
@@ -831,11 +831,11 @@ int save_hist(int nmass, bool resonant,bool bkg, bool fourb){
   Cat->Reset();
   gen_higgs->Reset();
   btagselected->Reset();
- basicLeptons.clear();
- basicHiggses.clear();
-// basicvbf.clear();
-//  for (unsigned int i=0; i<bl; i++) basicLeptons[i]->Reset();
-//  for (unsigned int i=0; i<bh; i++) basicHiggses[i]->Reset();
+// basicLeptons->Reset();
+// basicHiggses->Reset();
+// basicvbf->Reset();
+  for (unsigned int i=0; i<bl; i++) basicLeptons[i]->Reset();
+  for (unsigned int i=0; i<bh; i++) basicHiggses[i]->Reset();
   for (unsigned int i=0; i<bv; i++) basicvbf[i]->Reset();
   return 0;
 }
